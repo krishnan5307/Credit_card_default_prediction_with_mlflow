@@ -1,0 +1,27 @@
+pandas 
+mlflow==2.2.2  
+notebook 
+numpy 
+scikit-learn==1.0.2
+matplotlib 
+python-box==6.0.2 
+typing
+PYYAML 
+tqdm 
+ensure==1.0.2 
+joblib 
+types-PyYAML 
+Flask 
+Flask-Cors
+setuptools
+gunicorn
+#-e .
+ipykernel
+evidently
+dill
+urllib3
+six
+pathlib
+cassandra-driver
+## configbox = if we pass dict in this, we can direclty call keys by dict_name.keyname, 
+## ensure annotation - if user pass diff datatype , it thorws error 

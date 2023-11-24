@@ -1,0 +1,59 @@
+COLUMNS:
+  fixed acidity: float64
+  volatile acidity: float64
+  citric acid: float64
+  residual sugar: float64
+  chlorides: float64
+  free sulfur dioxide: float64
+  total sulfur dioxide: float64
+  density: float64
+  pH: float64
+  sulphates: float64
+  alcohol: float64
+  quality: int64
+
+columns:
+  age: int
+  children: int
+  bmi: float
+  expenses: float
+  sex: category
+  smoker: category
+  region: category
+
+columns_input:
+  age: int
+  children: int
+  bmi: float
+  sex: category
+  smoker: category
+  region: category  
+
+numerical_columns:
+  - age
+  - bmi
+  - children
+ 
+categorical_columns:
+  - sex
+  - smoker
+  - region
+
+target_column: expenses
+
+domain_value:
+  sex:
+    - male
+    - female
+  smoker:
+    - yes
+    - no  
+  region:
+    - southwest
+    - southeast
+    - northwest
+    - northeast 
+
+TARGET_COLUMN:
+  name: quality
+  

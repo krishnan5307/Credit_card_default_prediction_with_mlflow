@@ -1,0 +1,80 @@
+grid_search:
+  class: GridSearchCV
+  module: sklearn.model_selection
+  params:
+    cv: 5
+    verbose: 2
+model_selection:
+  module_0:
+    class: LinearRegression
+    module: sklearn.linear_model
+    params:
+      fit_intercept: true
+    search_param_grid:
+      fit_intercept:
+      - true
+      - false
+  module_1:
+    class: RandomForestRegressor
+    module: sklearn.ensemble
+    params:
+      min_samples_leaf: 3
+    search_param_grid:
+      min_samples_leaf:
+      - 6
+  module_2: 
+    class: GradientBoostingRegressor  
+    module: sklearn.ensemble
+    params:
+      n_estimators: 100
+      criterion: friedman_mse
+    search_param_grid:
+      n_estimators:
+      - 120
+      - 70
+      - 30
+      criterion:
+      - friedman_mse
+      - squared_error
+  module_3: 
+    class: DecisionTreeRegressor  
+    module: sklearn.tree
+    params:
+      criterion: squared_error
+      min_samples_leaf: 3 
+    search_param_grid:
+      criterion:
+      - squared_error
+      - absolute_error
+      min_samples_leaf:
+      - 6 
+  module_4: 
+    class: SVR  
+    module: sklearn.svm
+    params:
+      kernel: rbf
+      gamma: scale
+      min_samples_leaf: 3 
+    search_param_grid:
+      kernel:
+      - rbf
+      - linear
+      - sigmoid
+      gamma:
+      - auto
+  module_5: 
+    class: AdaBoostRegressor  
+    module: sklearn.ensemble
+    params:
+      n_estimators: 50
+      loss: linear
+    search_param_grid:
+      n_estimators:
+      - 100
+      - 70
+      - 30
+      loss:
+      - linear
+      - square
+      - exponential
+  
