@@ -3,7 +3,7 @@
 {% block head %}
 
 
-<title>Premium Estimator</title>
+<title>CREDIT CARD DEFAULTERS PREDICTOR</title>
 {% endblock %}
 
 {% block content %}
@@ -13,24 +13,15 @@
 
 
         <form action="/predict" method="post">
-            <legend>Insurance premium Estimation Form</legend>
+            <legend>Credit card defaulters prediction</legend>
             <div class="mb-3">
-                <label class="form-label">age</label>
-                <input class="form-control" type="text" name="age"
-                    placeholder="Enter the insured person age" required />
+                <label class="form-label">LIMIT_BAL</label>
+                <input class="form-control" type="text" name="LIMIT_BAL"
+                    placeholder="Amount of given credit in NT dollars (includes individual and family/supplementary credit)" required />
             </div>
             <div class="mb-3">
-                <label class="form-label">children</label>
-                <input class="form-control" type="text" name="children" placeholder="Enter no of children"
-                    required />
-            <div class="mb-3">
-                <label class="form-label">bmi</label>
-                <input class="form-control" type="text" name="bmi"         
-                    placeholder="Enter a value of bmi" required />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">sex</label>
-                <select class="form-control" name="sex" placeholder="Enter gender"
+                <label class="form-label">SEX</label>
+                <select class="form-control" name="SEX" placeholder="Enter gender"
                     required>
                     <option value="male">
                         male
@@ -42,41 +33,142 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label class="form-label">smoker</label>
-                <select class="form-control" name="smoker" placeholder="Do you smoke ?"
+                <label class="form-label">EDUCATION</label>
+                <select class="form-control" name="EDUCATION" placeholder="EDUCATION ?"
                     required>
-                    <option value="yes">
-                        yes
+                    <option value="graduate school">
+                        graduate school
                     </option>
-                    <option value="no">
-                        no
+                    <option value="university">
+                        university
+                    </option>
+                    <option value="high school">
+                        high school
+                    </option>
+                    <option value="others">
+                        others
+                    </option>
+                    <option value="unknown">
+                        unknown
                     </option>
 
                 </select>
             </div>
             <div class="mb-3">
-                <label class="form-label">region</label>
-                <select class="form-control" name="region" placeholder="Select your region"
+                <label class="form-label">MARRIAGE</label>
+                <select class="form-control" name="MARRIAGE" placeholder="Select your marrital status"
                     required>
 
-                    <option value="southwest">
-                        southwest
+                    <option value="married">
+                        married
                     </option>
-                    <option value="southeast">
-                        southeast
+                    <option value="single">
+                        single
                     </option>
-                    <option value="northwest">
-                        northwest
-                    </option>
-                    <option value="northeast">
-                        northeast
+                    <option value="others">
+                        others
                     </option>
 
                 </select>
             </div>
             <div class="mb-3">
+                <label class="form-label">AGE</label>
+                <input class="form-control" type="text" name="AGE"
+                    placeholder="Age in years" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_0</label>
+                <input class="form-control" type="text" name="PAY_0"
+                    placeholder="Repayment status in September, 2005 (-1=pay duly, 1=payment delay for one month, 2=payment delay for two months, … 8=payment delay for eight months, 9=payment delay for nine months and above)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_2</label>
+                <input class="form-control" type="text" name="PAY_2"
+                    placeholder="Repayment status in August, 2005 (scale same as above)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_3</label>
+                <input class="form-control" type="text" name="PAY_3"
+                    placeholder="Repayment status in July, 2005 (scale same as above)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_4</label>
+                <input class="form-control" type="text" name="PAY_4"
+                    placeholder="Repayment status in June, 2005 (scale same as above)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_5</label>
+                <input class="form-control" type="text" name="PAY_5"
+                    placeholder="Repayment status in May, 2005 (scale same as above)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_6</label>
+                <input class="form-control" type="text" name="PAY_6"
+                    placeholder="Repayment status in April, 2005 (scale same as above)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">BILL_AMT1</label>
+                <input class="form-control" type="text" name="BILL_AMT1"
+                    placeholder="Amount of bill statement in September, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">BILL_AMT2</label>
+                <input class="form-control" type="text" name="BILL_AMT2"
+                    placeholder="Amount of bill statement in August, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">BILL_AMT3</label>
+                <input class="form-control" type="text" name=BILL_AMT3"
+                    placeholder="Amount of bill statement in July, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">BILL_AMT4</label>
+                <input class="form-control" type="text" name="BILL_AMT4"
+                    placeholder="Amount of bill statement in June, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">BILL_AMT5</label>
+                <input class="form-control" type="text" name="BILL_AMT5"
+                    placeholder="Amount of bill statement in May, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">BILL_AMT6</label>
+                <input class="form-control" type="text" name="BILL_AMT6"
+                    placeholder="Amount of bill statement in April, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_AMT1</label>
+                <input class="form-control" type="text" name="PAY_AMT1"
+                    placeholder="Amount of previous payment in September, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_AMT2</label>
+                <input class="form-control" type="text" name="PAY_AMT2"
+                    placeholder="Amount of previous payment in August, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_AMT3</label>
+                <input class="form-control" type="text" name="PAY_AMT3"
+                    placeholder="Amount of previous payment in July, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_AMT4</label>
+                <input class="form-control" type="text" name="PAY_AMT4"
+                    placeholder="Amount of previous payment in June, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_AMT5</label>
+                <input class="form-control" type="text" name="PAY_AMT5"
+                    placeholder="Amount of previous payment in May, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PAY_AMT6</label>
+                <input class="form-control" type="text" name="PAY_AMT6"
+                    placeholder="Amount of previous payment in April, 2005 (NT dollar)" required />
+            </div>
+            <div class="mb-3">
 
-                <input class="btn btn-primary" type="submit" value="Predict the health insurance premium Value" required />
+                <input class="btn btn-primary" type="submit" value="Predict the credit card defaulters status" required />
             </div>
 
         </form>
@@ -85,18 +177,18 @@
     <div class="col-md-6 col-sm-12 col-xs-6 col-lg-6">
         <div class="card">
             <div class="card-header">
-              Health insurance premium expenses
+              credit card defaulter status
             </div>
             <div class="card-body">
-        {% if context['insurance_data'] is not none %}
+        {% if context['credit_data'] is not none %}
         <table class="table table-striped">
-            <caption>Health insurance premium</caption>
+            <caption>credit card defaulter status</caption>
             <tr>
                 <th>Input Feature</th>
                 <th>Feature Value</th>
 
             </tr>
-            {% for column,value in context['insurance_data'].items() %}
+            {% for column,value in context['credit_data'].items() %}
 
 
 
@@ -108,9 +200,9 @@
             {% endfor %}
             <tr>
 
-                <td>expenses</td>
+                <td>defaulter_status</td>
                 <td>
-                    {{ context['expenses'] }}
+                    {{ context['defaulter_status'] }}
                 </td>
             </tr>
         </table>
@@ -118,7 +210,7 @@
         {% else %}
        
               <h5 class="card-title">Submit Form</h5>
-              <p class="card-text">Kindly provide the necessary information to estimate health insurance premium</p>
+              <p class="card-text">Kindly provide the necessary information to predict the credit card defaulter status</p>
             
          
 
