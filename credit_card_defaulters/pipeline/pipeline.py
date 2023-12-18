@@ -1,27 +1,27 @@
 from collections import namedtuple
 from datetime import datetime
 import uuid
-from credit_Card_defaulters.config.configuration import Configuartion
-from credit_Card_defaulters.logger import logging, get_log_file_name
-from credit_Card_defaulters.exception import CreditException
+from credit_card_defaulters.config.configuration import Configuartion
+from credit_card_defaulters.logger import logging, get_log_file_name
+from credit_card_defaulters.exception import CreditException
 from threading import Thread
 from typing import List
 
 from multiprocessing import Process
-from credit_Card_defaulters.entity.artifact_entity import ModelPusherArtifact, DataIngestionArtifact, ModelEvaluationArtifact
-from credit_Card_defaulters.entity.artifact_entity import DataValidationArtifact, DataTransformationArtifact, ModelTrainerArtifact
-from credit_Card_defaulters.entity.config_entity import DataIngestionConfig, ModelEvaluationConfig
-from credit_Card_defaulters.component.data_ingestion import DataIngestion
-from credit_Card_defaulters.component.data_validation import DataValidation
-from credit_Card_defaulters.component.data_transformation import DataTransformation
-from credit_Card_defaulters.component.model_trainer import ModelTrainer
-from credit_Card_defaulters.component.model_evaluation import ModelEvaluation
-from credit_Card_defaulters.component.model_pusher import ModelPusher
+from credit_card_defaulters.entity.artifact_entity import ModelPusherArtifact, DataIngestionArtifact, ModelEvaluationArtifact
+from credit_card_defaulters.entity.artifact_entity import DataValidationArtifact, DataTransformationArtifact, ModelTrainerArtifact
+from credit_card_defaulters.entity.config_entity import DataIngestionConfig, ModelEvaluationConfig
+from credit_card_defaulters.component.data_ingestion import DataIngestion
+from credit_card_defaulters.component.data_validation import DataValidation
+from credit_card_defaulters.component.data_transformation import DataTransformation
+from credit_card_defaulters.component.model_trainer import ModelTrainer
+from credit_card_defaulters.component.model_evaluation import ModelEvaluation
+from credit_card_defaulters.component.model_pusher import ModelPusher
 import os, sys
 from collections import namedtuple
 from datetime import datetime
 import pandas as pd
-from credit_Card_defaulters.constant import EXPERIMENT_DIR_NAME, EXPERIMENT_FILE_NAME
+from credit_card_defaulters.constant import EXPERIMENT_DIR_NAME, EXPERIMENT_FILE_NAME
 
 Experiment = namedtuple("Experiment", ["experiment_id", "initialization_timestamp", "artifact_time_stamp",
                                        "running_status", "start_time", "stop_time", "execution_time", "message",
