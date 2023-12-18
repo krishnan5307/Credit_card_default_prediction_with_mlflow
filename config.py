@@ -19,14 +19,14 @@ class configuration():
         try:
             
             
-            print("Connecting to Cassandra Database: health-insurance-premium-prediction")
+            print("Connecting to Cassandra Database: credit_card_data")
             cloud_config =  {
                 ##'secure_connect_bundle': '<</PATH/TO/>>secure-connect-health-insurance-premium-prediction.zip'
-                'secure_connect_bundle': 'secure_bundle\secure-connect-health-insurance-premium-prediction.zip'    
+                'secure_connect_bundle': 'secure_bundle\secure-connect-credit-card-data.zip'    
          
             }   
     
-            auth_provider = self.PlainTextAuthProvider('lXSEkrnNwjRAZIMrrqDofZEt', 'Ky3RyksHe+NXdWbSsz7zAfkR5wZgodh-I4ZCmL,1Z.SvT7freEDqrB-Ffr2L5SddiRzX7NqYMXo28.PH7lrQ839wn1wz3DqBC-QUMi1550_4ZramWzGz5GMsgAthZC5E')
+            auth_provider = self.PlainTextAuthProvider('qeTfkUKhQWNfGsGBwRTbzAfQ', 'dv2Xf,+7zZuRstzPm42eDrOOZMMw_MZ+MsmtIUrY_fN+Q4H7PW.iqhjitnlM+,xo5kbohu1XZb514MMPXFWYkT-0WiUBhQY-qRjwNqJueb6,hMC5hk5mbUWd.nMaUkgQ')
             cluster = self.cluster(cloud=cloud_config, auth_provider= auth_provider)
             session = cluster.connect()
             session.row_factory = dict_factory
@@ -37,7 +37,7 @@ class configuration():
             ##se = session.execute(sql_test)
             ##print(se)
 
-            sql_query = "SELECT * FROM insurance.insurance"
+            sql_query = "SELECT * FROM credit_card.credit_card"
             for row in session.execute(sql_query):
                 data = data.append(pd.DataFrame(row, index=[0]))
             ##    data = pd.concat(pd.DataFrame(row, index=[0]))

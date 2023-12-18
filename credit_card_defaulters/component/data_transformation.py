@@ -1,9 +1,9 @@
-from cgi import test
+# from cgi import test
 from sklearn import preprocessing
-from insurance.exception import InsuranceException
-from insurance.logger import logging
-from insurance.entity.config_entity import DataTransformationConfig 
-from insurance.entity.artifact_entity import DataIngestionArtifact,\
+from credit_card_defaulters.exception import CreditException
+from credit_card_defaulters.logger import logging
+from credit_card_defaulters.entity.config_entity import DataTransformationConfig 
+from credit_card_defaulters.entity.artifact_entity import DataIngestionArtifact,\
 DataValidationArtifact,DataTransformationArtifact
 import sys,os
 import numpy as np
@@ -13,34 +13,32 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 import pandas as pd
-from insurance.constant import *
-from insurance.util.util import read_yaml_file,save_object,save_numpy_array_data,load_data
-
-
+from credit_card_defaulters.constant import *
+from credit_card_defaulters.util.util import read_yaml_file,save_object,save_numpy_array_data,load_data
 
 
 
 class FeatureGenerator(BaseEstimator, TransformerMixin):              ## inheriting classes
-
-    def __init__(self,age_ix=3,children_ix=5,columns=None):
+## class used in get_data_transformer_object funcition
+    def __init__(self,AGE_ix=6,LIMIT_BAL_ix=1,columns=None):
 
         try:            
             self.columns = columns
             if self.columns is not None:                                               
-                age_ix = self.columns.index(COLUMN_AGE)
-                children_ix = self.columns.index(COLUMN_CHILDREN)
+                AGE_ix = self.columns.index(COLUMN_AGE)
+                LIMIT_BAL_ix = self.columns.index(COLUMN_CHILDREN)
             else:
-                self.age_ix = age_ix
-                age_ix= self.age_ix
-                self.children_ix = children_ix
-                children_ix=self.children_ix
+                self.AGE_ix = AGE_ix
+                AGE_ix= self.AGE_ix
+                self.LIMIT_BAL_ix = LIMIT_BAL_ix
+                LIMIT_BAL_ix=self.LIMIT_BAL_ix
 
-            self.age_ix = age_ix
-            self.children_ix = children_ix  
+            self.AGE_ix = AGE_ix  ## index of col name age
+            self.LIMIT_BAL_ix = LIMIT_BAL_ix  ## index of column name children 
           
 
         except Exception as e:
-            raise InsuranceException(e, sys) from e
+            raise CreditException(e, sys) from e
  
 
 
@@ -51,8 +49,8 @@ class FeatureGenerator(BaseEstimator, TransformerMixin):              ## inherit
 
     def transform(self, X, y=None):
         try:
-            children_age_ratio = X[:, self.children_ix] / \
-                                 X[:, self.age_ix]   
+            LIMIT_BAL_AGE_ratio = X[:, self.LIMIT_BAL_ix] / \
+                                 X[:, self.AGE_ix]   
             # #                                              ##dividing one entire column with other
             # # ##population_per_household = X[:, self.population_ix] / \
             # #  ##                          X[:, self.households_ix]
@@ -63,7 +61,7 @@ class FeatureGenerator(BaseEstimator, TransformerMixin):              ## inherit
             # #         X, bmi_age_ratio, population_per_household, bedrooms_per_room]
             # # else:
             generated_feature = np.c_[ 
-                    X, children_age_ratio]
+                    X, LIMIT_BAL_AGE_ratio]
 
             # generated_feature = np.c_[ 
             #         X]
@@ -72,7 +70,7 @@ class FeatureGenerator(BaseEstimator, TransformerMixin):              ## inherit
             ##return X
         except Exception as e:
             print(e)
-            raise InsuranceException(e, sys) from e
+            raise CreditException(e, sys) from e
 
 
 
@@ -91,7 +89,7 @@ class DataTransformation:
             self.data_validation_artifact = data_validation_artifact
 
         except Exception as e:
-            raise InsuranceException(e,sys) from e
+            raise CreditException(e,sys) from e
 
     
 
@@ -99,10 +97,10 @@ class DataTransformation:
         try:
             schema_file_path = self.data_validation_artifact.schema_file_path      ##schema.yaml file
 
-            dataset_schema = read_yaml_file(file_path=schema_file_path)
+            dataset_schema = read_yaml_file(file_path=schema_file_path) ##schema.yaml file
 
             numerical_columns = dataset_schema[NUMERICAL_COLUMN_KEY]
-            categorical_columns = dataset_schema[CATEGORICAL_COLUMN_KEY]
+            #categorical_columns = dataset_schema[CATEGORICAL_COLUMN_KEY]
             columns = dataset_schema[COLUMNS]
             columns_input = dataset_schema[COLUMNS_INPUT]
 
@@ -116,26 +114,26 @@ class DataTransformation:
             ]
             )
 
-            cat_pipeline = Pipeline(steps=[
-                 ('impute', SimpleImputer(strategy="most_frequent")),
-                 ('one_hot_encoder', OneHotEncoder()),
-                 ('scaler', StandardScaler(with_mean=False))
-            ]
-            )
+            # cat_pipeline = Pipeline(steps=[
+            #      ('impute', SimpleImputer(strategy="most_frequent")),
+            #      ('one_hot_encoder', OneHotEncoder()),
+            #      ('scaler', StandardScaler(with_mean=False))
+            # ]
+            # )
 
-            logging.info(f"Categorical columns: {categorical_columns}")
+            #logging.info(f"Categorical columns: {categorical_columns}")
             logging.info(f"Numerical columns: {numerical_columns}")
 
 
             preprocessing = ColumnTransformer([
-                ('cat_pipeline', cat_pipeline, categorical_columns),
+                #('cat_pipeline', cat_pipeline, categorical_columns),
                 ('num_pipeline', num_pipeline, numerical_columns),
                 
             ])
             return preprocessing
 
         except Exception as e:
-            raise InsuranceException(e,sys) from e   
+            raise CreditException(e,sys) from e   
 
 
     def initiate_data_transformation(self)->DataTransformationArtifact: 
@@ -164,7 +162,7 @@ class DataTransformation:
 
             schema = read_yaml_file(file_path=schema_file_path)  ## getting schema
 
-            target_column_name = schema[TARGET_COLUMN_KEY]
+            target_column_name = schema[TARGET_COLUMN_KEY] ##default.payment.next.month
 
 
             logging.info(f"Splitting input and target feature from training and testing dataframe.")
@@ -180,14 +178,16 @@ class DataTransformation:
 
             input_feature_train_arr = preprocessing_obj.fit_transform(input_feature_train_df)    ## fit and trasfrom input train features
             input_feature_test_arr = preprocessing_obj.transform(input_feature_test_df)       ## trasfrom input test features
+            ## This preprocessing obj has learnt through train data and when we save the pre_process_obj, 
+            ## this will contain data learnt through train array which can be used to trasform new test datas
 
-            ##train_arr = np.c_[input_feature_train_df, np.array(target_feature_train_df)]
-            train_arr = np.c_[input_feature_train_arr, np.array(target_feature_train_df)]    ##trasfromed train df 
+
+            ## Concatenating to final transformed data frame
+           
+            train_arr = np.c_[input_feature_train_arr, np.array(target_feature_train_df)]  ##trasfromed train df      
+            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]     ##transormded test df 
             
-            ##test_arr = np.c_[input_feature_test_df, np.array(target_feature_test_df)] 
-            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]          ##transormded test df 
-            
-            transformed_train_dir = self.data_transformation_config.transformed_train_dir
+            transformed_train_dir = self.data_transformation_config.transformed_train_dir ## tuples
             transformed_test_dir = self.data_transformation_config.transformed_test_dir
 
             train_file_name = os.path.basename(train_file_path).replace(".csv",".npz")      ## changing fileextension
@@ -219,7 +219,7 @@ class DataTransformation:
             return data_transformation_artifact
         except Exception as e:
             print(e)
-            raise InsuranceException(e,sys) from e
+            raise CreditException(e,sys) from e
 
     def __del__(self):
         logging.info(f"{'>>'*30}Data Transformation log completed.{'<<'*30} \n\n")

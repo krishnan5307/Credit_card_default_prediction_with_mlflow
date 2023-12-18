@@ -1,78 +1,133 @@
 import os
 import sys
 
-from insurance.exception import InsuranceException
-from insurance.util.util import load_object
+from credit_card_defaulters.exception import CreditException
+from credit_card_defaulters.util.util import load_object
 
 import pandas as pd
 import numpy as np
 
 
-class InsuranceData:
+class CreditData:
 
-    def __init__(self,
 
-                  age: int,
-                  children: int,
-                  bmi: float,                  
-                  sex: str,
-                  smoker: str,
-                  region: str,
-                  expenses: float =None,
+    def __init__(self, 
+                 
+                 ID: int,
+                 LIMIT_BAL: float,
+                 SEX: int,
+                 EDUCATION: int,
+                 MARRIAGE: int,
+                 AGE: int,
+                 PAY_0: int,
+                 PAY_2: int,
+                 PAY_3: int,
+                 PAY_4: int,
+                 PAY_5: int,
+                 PAY_6: int,
+                 BILL_AMT1: float,
+                 BILL_AMT2: float,
+                 BILL_AMT3: float,
+                 BILL_AMT4: float,
+                 BILL_AMT5: float,
+                 BILL_AMT6: float,
+                 PAY_AMT1: float,
+                 PAY_AMT2: float,
+                 PAY_AMT3: float,
+                 PAY_AMT4: float,
+                 PAY_AMT5: float,
+                 PAY_AMT6: float,
+                 default_payment_next_month: int = None,  ## needs to be predicted
                   ):         
         try:
-            self.age = age
-            self.children = children
-            self.bmi = bmi
-            self.sex = sex
-            self.smoker = smoker
-            self.region = region
-            self.expenses = expenses
+            self.ID = ID
+            self.LIMIT_BAL = LIMIT_BAL
+            self.SEX = SEX
+            self.EDUCATION = EDUCATION
+            self.MARRIAGE = MARRIAGE
+            self.AGE = AGE
+            self.PAY_0 = PAY_0
+            self.PAY_2 = PAY_2
+            self.PAY_3 = PAY_3
+            self.PAY_4 = PAY_4
+            self.PAY_5 = PAY_5
+            self.PAY_6 = PAY_6
+            self.BILL_AMT1 = BILL_AMT1
+            self.BILL_AMT2 = BILL_AMT2
+            self.BILL_AMT3 = BILL_AMT3
+            self.BILL_AMT4 = BILL_AMT4
+            self.BILL_AMT5 = BILL_AMT5
+            self.BILL_AMT6 = BILL_AMT6
+            self.PAY_AMT1 = PAY_AMT1
+            self.PAY_AMT2 = PAY_AMT2
+            self.PAY_AMT3 = PAY_AMT3
+            self.PAY_AMT4 = PAY_AMT4
+            self.PAY_AMT5 = PAY_AMT5
+            self.PAY_AMT6 = PAY_AMT6
+            self.default_payment_next_month = default_payment_next_month,  ## needs to be predicted            
         except Exception as e:
-            raise InsuranceException(e, sys) from e
+            raise CreditException(e, sys) from e
 
-    def get_insurance_input_data_frame(self):
+    def get_credit_input_data_frame(self):
 
         try:
-            insuarnce_input_dict = self.get_insurance_data_as_dict()
-            df= pd.DataFrame(insuarnce_input_dict)
+            credit_input_dict = self.get_credit_data_as_dict()
+            df= pd.DataFrame(credit_input_dict)
             return df
 
         except Exception as e:
-            raise InsuranceException(e, sys) from e
+            raise CreditException(e, sys) from e
 
-    def get_insurance_data_as_dict(self):
+    def get_credit_data_as_dict(self):
         try:
             input_data = {
-                "age": [self.age],
-                "children": [self.children],
-                "bmi": [self.bmi],
-                "sex": [self.sex],
-                "smoker": [self.smoker],
-                "region": [self.region],
+                "LIMIT_BAL" : [self.LIMIT_BAL],
+                "SEX" : [self.SEX],
+                "ID" : [self.ID],
+                "EDUCATION" : [self.EDUCATION],
+                "MARRIAGE" : [self.MARRIAGE],
+                "AGE" : [self.AGE],
+                "PAY_0" : [self.PAY_0],
+                "PAY_2" : [self.PAY_2],
+                "PAY_3" : [self.PAY_3],
+                "PAY_4" : [self.PAY_4],
+                "PAY_5" : [self.PAY_5],
+                "PAY_6" : [self.PAY_6],
+                "BILL_AMT1" : [self.BILL_AMT1],
+                "BILL_AMT2" : [self.BILL_AMT2],
+                "BILL_AMT3" : [self.BILL_AMT3],
+                "BILL_AMT4" : [self.BILL_AMT4],
+                "BILL_AMT5" : [self.BILL_AMT5],
+                "BILL_AMT6" : [self.BILL_AMT6],
+                "PAY_AMT1" : [self.PAY_AMT1],
+                "PAY_AMT2" : [self.PAY_AMT2],
+                "PAY_AMT3" : [self.PAY_AMT3],
+                "PAY_AMT4" : [self.PAY_AMT4],
+                "PAY_AMT5" : [self.PAY_AMT5],
+                "PAY_AMT6" : [self.PAY_AMT6],
                              }
             return input_data
         except Exception as e:
-            raise InsuranceException(e, sys)
+            raise CreditException(e, sys)
 
 
-class InsurancePredictor:
+class CreditPredictor:
 
     def __init__(self, model_dir: str):
         try:
             self.model_dir = model_dir
         except Exception as e:
-            raise InsuranceException(e, sys) from e
+            raise CreditException(e, sys) from e
 
     def get_latest_model_path(self):
         try:
-            folder_name = list(map(int, os.listdir(self.model_dir)))
+            folder_name = list(map(int, os.listdir(self.model_dir))) ## converting to int
             latest_model_dir = os.path.join(self.model_dir, f"{max(folder_name)}")
             file_name = os.listdir(latest_model_dir)[0]
             latest_model_path = os.path.join(latest_model_dir, file_name)
             return latest_model_path
         except Exception as e:
-            raise InsuranceException(e, sys) from e
+            raise CreditException(e, sys) from e
 
     def predict(self, X):
         try:
@@ -81,4 +136,4 @@ class InsurancePredictor:
             expenses = model.predict(X)
             return expenses
         except Exception as e:
-            raise InsuranceException(e, sys) from e
+            raise CreditException(e, sys) from e

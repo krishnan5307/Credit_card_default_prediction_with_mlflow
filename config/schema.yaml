@@ -1,45 +1,90 @@
-COLUMNS:
-  fixed acidity: float64
-  volatile acidity: float64
-  citric acid: float64
-  residual sugar: float64
-  chlorides: float64
-  free sulfur dioxide: float64
-  total sulfur dioxide: float64
-  density: float64
-  pH: float64
-  sulphates: float64
-  alcohol: float64
-  quality: int64
-
 columns:
-  age: int
-  children: int
-  bmi: float
-  expenses: float
-  sex: category
-  smoker: category
-  region: category
+  ID: int
+  LIMIT_BAL: float
+  SEX: int
+  EDUCATION: int
+  MARRIAGE: int
+  AGE: int
+  PAY_0: int
+  PAY_2: int
+  PAY_3: int
+  PAY_4: int
+  PAY_5: int
+  PAY_6: int
+  BILL_AMT1: float
+  BILL_AMT2: float
+  BILL_AMT3: float
+  BILL_AMT4: float
+  BILL_AMT5: float
+  BILL_AMT6: float
+  PAY_AMT1: float
+  PAY_AMT2: float
+  PAY_AMT3: float
+  PAY_AMT4: float
+  PAY_AMT5: float
+  PAY_AMT6: float
+  default.payment.next.month: int
+
 
 columns_input:
-  age: int
-  children: int
-  bmi: float
-  sex: category
-  smoker: category
-  region: category  
+  ID: int
+  LIMIT_BAL: int
+  SEX: int
+  EDUCATION: int
+  MARRIAGE: int
+  AGE: int
+  PAY_0: int
+  PAY_2: int
+  PAY_3: int
+  PAY_4: int
+  PAY_5: int
+  PAY_6: int
+  BILL_AMT1: int
+  BILL_AMT2: int
+  BILL_AMT3: int
+  BILL_AMT4: int
+  BILL_AMT5: int
+  BILL_AMT6: int
+  PAY_AMT1: int
+  PAY_AMT2: int
+  PAY_AMT3: int
+  PAY_AMT4: int
+  PAY_AMT5: int
+  PAY_AMT6: int
+
 
 numerical_columns:
-  - age
-  - bmi
-  - children
+  - ID
+  - LIMIT_BAL
+  - SEX
+  - EDUCATION
+  - MARRIAGE
+  - AGE
+  - PAY_0
+  - PAY_2
+  - PAY_3
+  - PAY_4
+  - PAY_5
+  - PAY_6
+  - BILL_AMT1
+  - BILL_AMT2
+  - BILL_AMT3
+  - BILL_AMT4
+  - BILL_AMT5
+  - BILL_AMT6
+  - PAY_AMT1
+  - PAY_AMT2
+  - PAY_AMT3
+  - PAY_AMT4
+  - PAY_AMT5
+  - PAY_AMT6
+  - default.payment.next.month
+
  
 categorical_columns:
-  - sex
-  - smoker
-  - region
+ 
 
-target_column: expenses
+target_column: default.payment.next.month
 
 domain_value:
   sex:
@@ -55,5 +100,5 @@ domain_value:
     - northeast 
 
 TARGET_COLUMN:
-  name: quality
+  name: default.payment.next.month
   

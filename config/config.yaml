@@ -1,9 +1,9 @@
 training_pipeline_config:
-  pipeline_name: insurance
+  pipeline_name: credit_Card_defaulters
   artifact_dir: artifact
 
 data_ingestion_config:
-  dataset_download_url: insurance.csv
+  dataset_download_url: credit_card.csv
   tgz_download_dir: tgz_data
   ingested_dir: ingested_data
   ingested_train_dir: train

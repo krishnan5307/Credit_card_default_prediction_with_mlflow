@@ -2,22 +2,23 @@ from flask import Flask, request
 import sys
 import numpy as np, pandas as pd
 import pip
-from insurance.util.util import read_yaml_file, write_yaml_file
+from credit_card_defaulters.util.util import read_yaml_file, write_yaml_file
 from matplotlib.style import context
-from insurance.logger import logging
-from insurance.exception import InsuranceException
+from credit_card_defaulters.logger import logging
+from credit_card_defaulters.exception import InsuranceException
 import os, sys
 import json
-from insurance.config.configuration import Configuartion
-from insurance.constant import CONFIG_DIR, get_current_time_stamp
-from insurance.pipeline.pipeline import Pipeline
-from insurance.entity.premium_predictor import InsurancePredictor, InsuranceData
+from credit_card_defaulters.config.configuration import Configuartion
+from credit_card_defaulters.constant import CONFIG_DIR, get_current_time_stamp
+from credit_card_defaulters.pipeline.pipeline import Pipeline
+from credit_card_defaulters.entity.premium_predictor import CreditPredictor, CreditData
 from flask import send_file, abort, render_template
+
 
 
 ROOT_DIR = os.getcwd()
 LOG_FOLDER_NAME = "logs"
-PIPELINE_FOLDER_NAME = "insurance"
+PIPELINE_FOLDER_NAME = "credit_card_defaulters"
 SAVED_MODELS_DIR_NAME = "saved_models"
 MODEL_CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, "model.yaml")
 LOG_DIR = os.path.join(ROOT_DIR, LOG_FOLDER_NAME)
@@ -25,10 +26,10 @@ PIPELINE_DIR = os.path.join(ROOT_DIR, PIPELINE_FOLDER_NAME)
 MODEL_DIR = os.path.join(ROOT_DIR, SAVED_MODELS_DIR_NAME)
 
 
-from insurance.logger import get_log_dataframe
+from credit_card_defaulters.logger import get_log_dataframe
 
-INSURANCE_DATA_KEY = "insurance_data"
-EXPENSES_VALUE_KEY = "expenses"
+CREDIT_DATA_KEY = "credit_data"
+CREDIT_VALUE_KEY = "defaulter_status"
 
 app = Flask(__name__)
 
@@ -61,33 +62,80 @@ def train():
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     context = {                               ## declared outside of request.method for to be used both after and before submiting form and view html predict.html
-        INSURANCE_DATA_KEY: None,
-        EXPENSES_VALUE_KEY: None
+        CREDIT_DATA_KEY: None,
+        CREDIT_VALUE_KEY: None
     }
 
     if request.method == 'POST':      ## accessed when html form sends request while submiting form 
                                       ## html form has inbuilt request sending methods Post, Get etc and action(eg - /predict)
                                       ## Corresponds to the HTTP POST or GET method; form data are included in the body of the form and sent to the server.
-        age = int(request.form['age'])
-        children = int(request.form['children'])
-        bmi = float(request.form['bmi'])
-        sex = request.form['sex']
-        smoker = request.form['smoker']
-        region = request.form['region']
-        insurance_data = InsuranceData(age = age,
-                                     children = children,
-                                     bmi = bmi,
-                                     sex = sex,
-                                     smoker = smoker,
-                                     region = region,
-                                       ) 
+       ## The html predict page will have form with fileds of the variables where we can type the text 
+       ## and this text when got submited (button) will call this POST mehtod where we can access
+       ## the data in the form we gave using below code given below
+        ID = int(request.form['ID'])
+        LIMIT_BAL = float(request.form['LIMIT_BAL'])
+        SEX = int(request.form['SEX'])
+        EDUCATION: int(request.form['EDUCATION'])
+        MARRIAGE: int(request.form['MARRIAGE'])
+        AGE: int(request.form['AGE'])
+        PAY_0 = int(request.form['PAY_0'])
+        PAY_2 = int(request.form['PAY_2'])
+        PAY_3 = int(request.form['PAY_3'])
+        PAY_4 = int(request.form['PAY_4'])
+        PAY_5 = int(request.form['PAY_5'])
+        PAY_6 = int(request.form['PAY_6'])
+        BILL_AMT1 = float(request.form['BILL_AMT1'])
+        BILL_AMT2 = float(request.form['BILL_AMT2'])
+        BILL_AMT3 = float(request.form['BILL_AMT3'])
+        BILL_AMT4 = float(request.form['BILL_AMT4'])
+        BILL_AMT5 = float(request.form['BILL_AMT5'])
+        BILL_AMT6 = float(request.form['BILL_AMT6'])
+        PAY_AMT1 = float(request.form['PAY_AMT1'])
+        PAY_AMT2 = float(request.form['PAY_AMT2'])
+        PAY_AMT3 = float(request.form['PAY_AMT3'])
+        PAY_AMT4 = float(request.form['PAY_AMT4'])
+        PAY_AMT5 = float(request.form['PAY_AMT5'])
+        PAY_AMT6 = float(request.form['PAY_AMT6'])
+        ## now we need to pass this data to CreditData class to predict the output
+
+        credit_data = CreditData(
+                                LIMIT_BAL = LIMIT_BAL,
+                                SEX = SEX,
+                                ID = ID,
+                                EDUCATION = EDUCATION,
+                                MARRIAGE = MARRIAGE,
+                                AGE = AGE,
+                                PAY_0 = PAY_0,
+                                PAY_2 = PAY_2,
+                                PAY_3 = PAY_3,
+                                PAY_4 = PAY_4,
+                                PAY_5 = PAY_5,
+                                PAY_6 = PAY_6,
+                                BILL_AMT1 = BILL_AMT1,
+                                BILL_AMT2 = BILL_AMT2,
+                                BILL_AMT3 = BILL_AMT3,
+                                BILL_AMT4 = BILL_AMT4,
+                                BILL_AMT5 = BILL_AMT5,
+                                BILL_AMT6 = BILL_AMT6,
+                                PAY_AMT1 = PAY_AMT1,
+                                PAY_AMT2 = PAY_AMT2,
+                                PAY_AMT3 = PAY_AMT3,
+                                PAY_AMT4 = PAY_AMT4,
+                                PAY_AMT5 = PAY_AMT5,
+                                PAY_AMT6 = PAY_AMT6
+                                                ) 
         
-        insurance_df = insurance_data.get_insurance_input_data_frame() ## calling function inside hosuing class
-        premium_predictor = InsurancePredictor(model_dir=MODEL_DIR)      ## creating an object with intialization as model_dir
-        expenses = premium_predictor.predict(X=insurance_df)   ## using the above obj to do preiction
+        credit_df = credit_data.get_credit_input_data_frame() ## calling function inside hosuing class
+        credit_predictor = CreditPredictor(model_dir=MODEL_DIR)      ## creating an object with intialization as model_dir
+        defaulter_status = credit_predictor.predict(X=credit_df)   ## using the above obj to do preiction
+        
+        ## Now we need to pass the results predicted back to the HTML via context- Thats why predict.html has 2 sections
+        ## one to take the input for predciton asn next section to show the predcited output
+        ## initially context value will be None before submitting form and  context value will update to 
+        ## below after predciting the value .
         context = {
-            INSURANCE_DATA_KEY: insurance_data.get_insurance_data_as_dict(), ## FOR PASSING TO HTML PAGE VIA CONTEXT
-            EXPENSES_VALUE_KEY: expenses,
+            CREDIT_DATA_KEY: credit_data.get_credit_data_as_dict(), ## FOR PASSING TO HTML PAGE VIA CONTEXT
+            CREDIT_VALUE_KEY: defaulter_status,
         }
         return render_template('predict.html', context=context)
     return render_template("predict.html", context=context)     ## to display html when  '/predict'

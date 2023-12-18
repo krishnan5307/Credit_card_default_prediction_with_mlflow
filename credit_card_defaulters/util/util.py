@@ -1,11 +1,11 @@
 import yaml
-from insurance.exception import InsuranceException
+from credit_card_defaulters.exception import CreditException
 import os,sys
 import numpy as np
 import dill
 import pandas as pd
 import numpy as  np
-from insurance.constant import *
+from credit_card_defaulters.constant import *
 
 
 def write_yaml_file(file_path:str,data:dict=None):
@@ -20,7 +20,7 @@ def write_yaml_file(file_path:str,data:dict=None):
             if data is not None:
                 yaml.dump(data,yaml_file)
     except Exception as e:
-        raise InsuranceException(e,sys)
+        raise CreditException(e,sys)
 
 
 def read_yaml_file(file_path:str)->dict:
@@ -32,7 +32,7 @@ def read_yaml_file(file_path:str)->dict:
         with open(file_path, 'rb') as yaml_file:
             return yaml.safe_load(yaml_file)
     except Exception as e:
-        raise InsuranceException(e,sys) from e
+        raise CreditException(e,sys) from e
 
 
 def save_numpy_array_data(file_path: str, array: np.array):
@@ -47,7 +47,7 @@ def save_numpy_array_data(file_path: str, array: np.array):
         with open(file_path, 'wb') as file_obj:
             np.save(file_obj, array)
     except Exception as e:
-        raise InsuranceException(e, sys) from e
+        raise CreditException(e, sys) from e
 
 
 def load_numpy_array_data(file_path: str) -> np.array:
@@ -61,7 +61,7 @@ def load_numpy_array_data(file_path: str) -> np.array:
             return np.load(file_obj)
     except Exception as e:
         print(e)
-        raise InsuranceException(e, sys) from e
+        raise CreditException(e, sys) from e
 
 
 def save_object(file_path:str,obj):
@@ -75,7 +75,7 @@ def save_object(file_path:str,obj):
         with open(file_path, "wb") as file_obj:
             dill.dump(obj, file_obj)
     except Exception as e:
-        raise InsuranceException(e,sys) from e
+        raise CreditException(e,sys) from e
 
 
 def load_object(file_path:str):
@@ -86,14 +86,14 @@ def load_object(file_path:str):
         with open(file_path, "rb") as file_obj:
             return dill.load(file_obj)
     except Exception as e:
-        raise InsuranceException(e,sys) from e
+        raise CreditException(e,sys) from e
 
 
 def load_data(file_path: str, schema_file_path: str) -> pd.DataFrame:           ## load and return dataframe
     try:
-        datatset_schema = read_yaml_file(schema_file_path)
+        datatset_schema = read_yaml_file(schema_file_path) ## reading schema.yaml file
 
-        schema = datatset_schema[DATASET_SCHEMA_COLUMNS_KEY]
+        schema = datatset_schema[DATASET_SCHEMA_COLUMNS_KEY]  ## fetching columns key in schema.yaml
 
         dataframe = pd.read_csv(file_path)
 
@@ -110,5 +110,5 @@ def load_data(file_path: str, schema_file_path: str) -> pd.DataFrame:           
         return dataframe
 
     except Exception as e:
-        raise InsuranceException(e,sys) from e
+        raise CreditException(e,sys) from e
     
