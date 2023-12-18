@@ -1,5 +1,4 @@
 columns:
-  ID: int
   LIMIT_BAL: float
   SEX: int
   EDUCATION: int
@@ -27,7 +26,6 @@ columns:
 
 
 columns_input:
-  ID: int
   LIMIT_BAL: int
   SEX: int
   EDUCATION: int
@@ -54,7 +52,6 @@ columns_input:
 
 
 numerical_columns:
-  - ID
   - LIMIT_BAL
   - SEX
   - EDUCATION
@@ -78,26 +75,24 @@ numerical_columns:
   - PAY_AMT4
   - PAY_AMT5
   - PAY_AMT6
-  - default.payment.next.month
-
  
 categorical_columns:
  
 
 target_column: default.payment.next.month
 
-domain_value:
-  sex:
-    - male
-    - female
-  smoker:
-    - yes
-    - no  
-  region:
-    - southwest
-    - southeast
-    - northwest
-    - northeast 
+# domain_value:
+#   sex:
+#     - male
+#     - female
+#   smoker:
+#     - yes
+#     - no  
+#   region:
+#     - southwest
+#     - southeast
+#     - northwest
+#     - northeast 
 
 TARGET_COLUMN:
   name: default.payment.next.month

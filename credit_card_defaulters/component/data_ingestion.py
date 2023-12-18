@@ -43,6 +43,8 @@ class DataIngestion:
             #df = configuration.start()
 
             df = self.database_connection.get_configuration()
+            ## removing first ID column now itself
+            df.drop("ID", axis=1, inplace=True)
 
             
 

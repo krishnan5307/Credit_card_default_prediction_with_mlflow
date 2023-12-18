@@ -72,11 +72,11 @@ def predict():
        ## The html predict page will have form with fileds of the variables where we can type the text 
        ## and this text when got submited (button) will call this POST mehtod where we can access
        ## the data in the form we gave using below code given below
-        ID = int(request.form['ID'])
+
         LIMIT_BAL = float(request.form['LIMIT_BAL'])
-        SEX = int(request.form['SEX'])
-        EDUCATION: int(request.form['EDUCATION'])
-        MARRIAGE: int(request.form['MARRIAGE'])
+        SEX = request.form['SEX']
+        EDUCATION: request.form['EDUCATION']
+        MARRIAGE: request.form['MARRIAGE']
         AGE: int(request.form['AGE'])
         PAY_0 = int(request.form['PAY_0'])
         PAY_2 = int(request.form['PAY_2'])
@@ -96,14 +96,17 @@ def predict():
         PAY_AMT4 = float(request.form['PAY_AMT4'])
         PAY_AMT5 = float(request.form['PAY_AMT5'])
         PAY_AMT6 = float(request.form['PAY_AMT6'])
-        ## now we need to pass this data to CreditData class to predict the output
+        ## now we need to replace integer keys for SEX, MARRIAGE a&nd EDUCATION and pass this data 
+        ## to CreditData class to predict the output
 
+        sex = {"male":1, "female":2}
+        education = {"graduate school":1, "university":2, "high school":3, "others":4, "unknown":5}
+        marriage = {"married":1, "single":2, "others":3}
         credit_data = CreditData(
                                 LIMIT_BAL = LIMIT_BAL,
-                                SEX = SEX,
-                                ID = ID,
-                                EDUCATION = EDUCATION,
-                                MARRIAGE = MARRIAGE,
+                                SEX = sex[SEX],
+                                EDUCATION = education[EDUCATION],
+                                MARRIAGE = marriage[MARRIAGE],
                                 AGE = AGE,
                                 PAY_0 = PAY_0,
                                 PAY_2 = PAY_2,

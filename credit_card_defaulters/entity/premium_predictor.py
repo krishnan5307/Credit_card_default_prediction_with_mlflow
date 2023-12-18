@@ -13,7 +13,7 @@ class CreditData:
 
     def __init__(self, 
                  
-                 ID: int,
+              
                  LIMIT_BAL: float,
                  SEX: int,
                  EDUCATION: int,
@@ -40,7 +40,7 @@ class CreditData:
                  default_payment_next_month: int = None,  ## needs to be predicted
                   ):         
         try:
-            self.ID = ID
+           
             self.LIMIT_BAL = LIMIT_BAL
             self.SEX = SEX
             self.EDUCATION = EDUCATION
