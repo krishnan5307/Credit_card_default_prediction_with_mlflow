@@ -5,7 +5,7 @@ import pip
 from credit_card_defaulters.util.util import read_yaml_file, write_yaml_file
 from matplotlib.style import context
 from credit_card_defaulters.logger import logging
-from credit_card_defaulters.exception import InsuranceException
+from credit_card_defaulters.exception import CreditException
 import os, sys
 import json
 from credit_card_defaulters.config.configuration import Configuartion
