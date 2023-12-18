@@ -131,14 +131,15 @@ def predict():
         credit_df = credit_data.get_credit_input_data_frame() ## calling function inside hosuing class
         credit_predictor = CreditPredictor(model_dir=MODEL_DIR)      ## creating an object with intialization as model_dir
         defaulter_status = credit_predictor.predict(X=credit_df)   ## using the above obj to do preiction
-        
+        ## converting defaulter status into readable form now 
+        defaulter = {1:"Default payment (Yes, the customer defaulted)", 0:"No default payment (No, the customer did not default)"}
         ## Now we need to pass the results predicted back to the HTML via context- Thats why predict.html has 2 sections
         ## one to take the input for predciton asn next section to show the predcited output
         ## initially context value will be None before submitting form and  context value will update to 
         ## below after predciting the value .
         context = {
             CREDIT_DATA_KEY: credit_data.get_credit_data_as_dict(), ## FOR PASSING TO HTML PAGE VIA CONTEXT
-            CREDIT_VALUE_KEY: defaulter_status,
+            CREDIT_VALUE_KEY: defaulter[defaulter_status],
         }
         return render_template('predict.html', context=context)
     return render_template("predict.html", context=context)     ## to display html when  '/predict'
