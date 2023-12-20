@@ -83,7 +83,6 @@ class CreditData:
             input_data = {
                 "LIMIT_BAL" : [self.LIMIT_BAL],
                 "SEX" : [self.SEX],
-                "ID" : [self.ID],
                 "EDUCATION" : [self.EDUCATION],
                 "MARRIAGE" : [self.MARRIAGE],
                 "AGE" : [self.AGE],

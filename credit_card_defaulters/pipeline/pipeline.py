@@ -170,7 +170,7 @@ class Pipeline(Thread):
                                              message="Pipeline has been completed.",
                                              experiment_file_path=Pipeline.experiment_file_path,
                                              is_model_accepted=model_evaluation_artifact.is_model_accepted,
-                                             accuracy=model_trainer_artifact.model_accuracy
+                                             accuracy=model_trainer_artifact.model_f1_score
                                              )
             logging.info(f"Pipeline experiment: {Pipeline.experiment}")
             self.save_experiment()

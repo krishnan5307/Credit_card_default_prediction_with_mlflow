@@ -75,9 +75,9 @@ def predict():
 
         LIMIT_BAL = float(request.form['LIMIT_BAL'])
         SEX = request.form['SEX']
-        EDUCATION: request.form['EDUCATION']
-        MARRIAGE: request.form['MARRIAGE']
-        AGE: int(request.form['AGE'])
+        EDUCATION = request.form['EDUCATION']
+        MARRIAGE = request.form['MARRIAGE']
+        AGE = int(request.form['AGE'])
         PAY_0 = int(request.form['PAY_0'])
         PAY_2 = int(request.form['PAY_2'])
         PAY_3 = int(request.form['PAY_3'])
@@ -131,6 +131,7 @@ def predict():
         credit_df = credit_data.get_credit_input_data_frame() ## calling function inside hosuing class
         credit_predictor = CreditPredictor(model_dir=MODEL_DIR)      ## creating an object with intialization as model_dir
         defaulter_status = credit_predictor.predict(X=credit_df)   ## using the above obj to do preiction
+        defaulter_stat= int(defaulter_status)
         ## converting defaulter status into readable form now 
         defaulter = {1:"Default payment (Yes, the customer defaulted)", 0:"No default payment (No, the customer did not default)"}
         ## Now we need to pass the results predicted back to the HTML via context- Thats why predict.html has 2 sections
@@ -139,7 +140,7 @@ def predict():
         ## below after predciting the value .
         context = {
             CREDIT_DATA_KEY: credit_data.get_credit_data_as_dict(), ## FOR PASSING TO HTML PAGE VIA CONTEXT
-            CREDIT_VALUE_KEY: defaulter[defaulter_status],
+            CREDIT_VALUE_KEY: defaulter[defaulter_stat],
         }
         return render_template('predict.html', context=context)
     return render_template("predict.html", context=context)     ## to display html when  '/predict'
