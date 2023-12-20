@@ -72,6 +72,7 @@ class DataIngestion:
             df.to_csv(tgz_file_path, mode="w", index=False, header=True)
             ## urllib.request.urlretrieve(download_url, tgz_file_path)
             logging.info(f"File :[{tgz_file_path}] has been downloaded successfully.")
+            print("succeffully created: checking for debugging")
             return tgz_file_path
 
         except Exception as e:

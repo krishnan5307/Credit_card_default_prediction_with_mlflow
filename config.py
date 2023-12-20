@@ -3,7 +3,8 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import dict_factory
 import pandas as pd
 
-
+CASSANDRA_KEYSPACE = "credit"
+CASSANDRA_TABLE = "credit_data"
 
 class configuration():
 
@@ -19,32 +20,38 @@ class configuration():
         try:
             
             
-            print("Connecting to Cassandra Database: credit_card_data")
+            print("Connecting to Cassandra Database: credit")
             cloud_config =  {
-                ##'secure_connect_bundle': '<</PATH/TO/>>secure-connect-health-insurance-premium-prediction.zip'
-                'secure_connect_bundle': 'secure_bundle\secure-connect-credit-card-data.zip'    
-         
+            ##'secure_connect_bundle': '<</PATH/TO/>>secure-connect-health-insurance-premium-prediction.zip'
+                        'secure_connect_bundle': r'C:\\data science\\Internship projects\\credit card defaulters\\Credit_card_default_prediction_with_mlflow\secure_bundle\secure-connect-credit.zip'
             }   
-    
-            auth_provider = self.PlainTextAuthProvider('qeTfkUKhQWNfGsGBwRTbzAfQ', 'dv2Xf,+7zZuRstzPm42eDrOOZMMw_MZ+MsmtIUrY_fN+Q4H7PW.iqhjitnlM+,xo5kbohu1XZb514MMPXFWYkT-0WiUBhQY-qRjwNqJueb6,hMC5hk5mbUWd.nMaUkgQ')
-            cluster = self.cluster(cloud=cloud_config, auth_provider= auth_provider)
+
+            auth_provider = PlainTextAuthProvider('PhGlatcyaNvkYeTNazxKUpeo', 'c_u3tM4DUkkOE945mcdKSjouj4HvvfkfMl0r.Z7fEN17Seqgy0iREqXl,oe-D3LlNe,Bfub50q.eT0AUrvk41a2FfoDuXT8bjtwPgZGOM.EKd15Npso_1QNPdpcrWY0L')
+            ## client_id and secret
+            cluster = Cluster(cloud=cloud_config, auth_provider= auth_provider)
             session = cluster.connect()
+
+            row = session.execute("select release_version from system.local").one()
+            if row:
+                print(row[0],"Successfully connected to cassandra database: 'credit'")
+            else:
+                print("An error occurred.")
             session.row_factory = dict_factory
 
                
-            data= pd.DataFrame()
+            # data= pd.DataFrame()
             ##sql_test="SELECT * FROM insurance.insurance LIMIT 300"
             ##se = session.execute(sql_test)
             ##print(se)
+            cql_query = "SELECT * FROM {}.{};".format(CASSANDRA_KEYSPACE, CASSANDRA_TABLE)
+            # Fetch data from Cassandra
+            cassandra_data = session.execute(cql_query)
 
-            sql_query = "SELECT * FROM credit_card.credit_card"
-            for row in session.execute(sql_query):
-                data = data.append(pd.DataFrame(row, index=[0]))
-            ##    data = pd.concat(pd.DataFrame(row, index=[0]))
-            data = data.reset_index(drop=True).fillna(pd.np.nan)    
-            data.to_csv("dataset/dataset.csv",mode="w", index=False,header=True)
+            # Convert data to a Pandas DataFrame
+            df = pd.DataFrame(list(cassandra_data))
+            df.to_csv("dataset/dataset.csv",mode="w", index=False,header=True)
             session.shutdown()
-            return data
+            return df
 
             
             

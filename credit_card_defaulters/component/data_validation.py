@@ -171,6 +171,9 @@ class DataValidation:
             report_dir = os.path.dirname(report_file_path)    ## creating dir now if it doesnt exists
             os.makedirs(report_dir,exist_ok=True)
 
+            data_drift_report.save_json(report_file_path)
+            data_quality_report.save_json(report_file_path)
+
             """
              "IMPORTANT"
 
@@ -186,18 +189,19 @@ class DataValidation:
             
             """
 
-            with open(report_file_path,"w") as report_file:
-                json.dump(data_drift_report, report_file, indent=6) ## indent=6 means that each level of nesting in the JSON file will be 
-                json.dump(data_quality_report, report_file, indent=6)
-                ## indented with 6 spaces from parenthesis.
-                """   eg:  {------
-                                  abjb: cnknc
-                                  cbfnbf:vnfkvn
-                           }
-                """     
+            # with open(report_file_path,"w") as report_file:
+            #     json.dump(data_drift_report, report_file, indent=6) ## indent=6 means that each level of nesting in the JSON file will be 
+            #     json.dump(data_quality_report, report_file, indent=6)
+            #     ## indented with 6 spaces from parenthesis.
+            #     """   eg:  {------
+            #                       abjb: cnknc
+            #                       cbfnbf:vnfkvn
+            #                }
+            #     """     
             return data_drift_report, data_quality_report
         except Exception as e:
             raise CreditException(e,sys) from e
+            print(e)
 
     def save_data_drift_report_page(self): ## for dashboard and saving report page.html
         try:

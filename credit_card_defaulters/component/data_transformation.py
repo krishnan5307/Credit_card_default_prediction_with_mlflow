@@ -26,7 +26,7 @@ class FeatureGenerator(BaseEstimator, TransformerMixin):              ## inherit
             self.columns = columns
             if self.columns is not None:                                               
                 AGE_ix = self.columns.index(COLUMN_AGE)
-                LIMIT_BAL_ix = self.columns.index(COLUMN_CHILDREN)
+                LIMIT_BAL_ix = self.columns.index(COLUMN_LIMIT_BAL)
             else:
                 self.AGE_ix = AGE_ix
                 AGE_ix= self.AGE_ix

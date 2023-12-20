@@ -61,9 +61,8 @@ DATA_TRANSFORMATION_PREPROCESSED_FILE_NAME_KEY = "preprocessed_object_file_name"
 
 
 
-COLUMN_AGE = "age"
-COLUMN_BMI = "bmi"
-COLUMN_CHILDREN = "children"
+COLUMN_AGE = "AGE"
+COLUMN_LIMIT_BAL = "LIMIT_BAL"
 DATASET_SCHEMA_COLUMNS_KEY=  "columns"
 
 NUMERICAL_COLUMN_KEY="numerical_columns"

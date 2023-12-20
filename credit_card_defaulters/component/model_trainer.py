@@ -136,16 +136,30 @@ class ModelTrainer:
             save_object(file_path=trained_model_file_path,obj=premium_model)
 
 
-            model_trainer_artifact=  ModelTrainerArtifact(is_trained=True,message="Model Trained successfully",
+            # model_trainer_artifact=  ModelTrainerArtifact(is_trained=True,message="Model Trained successfully",
+            # trained_model_file_path=trained_model_file_path,
+            # train_rmse=metric_info.train_rmse,
+            # test_rmse=metric_info.test_rmse,
+            # train_accuracy=metric_info.train_accuracy,
+            # test_accuracy=metric_info.test_accuracy,
+            # model_accuracy=metric_info.model_accuracy
+            
+            # )
+
+            model_trainer_artifact= ModelTrainerArtifact(is_trained=True,message="Model Trained successfully",
             trained_model_file_path=trained_model_file_path,
-            train_rmse=metric_info.train_rmse,
-            test_rmse=metric_info.test_rmse,
+            train_precision = metric_info.train_precision,
+            test_precision= metric_info.test_precision,
+            train_recall= metric_info.train_recall,
+            test_recall= metric_info.test_recall, 
+            train_f1_score= metric_info.train_f1_score,
+            test_f1_score= metric_info.test_f1_score,
+            model_f1_score= metric_info.model_f1_score,
             train_accuracy=metric_info.train_accuracy,
             test_accuracy=metric_info.test_accuracy,
-            model_accuracy=metric_info.model_accuracy
-            
+            auc_roc= metric_info.auc_roc,
+            auc_value = metric_info.auc_value
             )
-
             logging.info(f"Model Trainer Artifact: {model_trainer_artifact}")
             return model_trainer_artifact
         except Exception as e:

@@ -153,7 +153,7 @@ class ModelEvaluation:
                                                                y_train=train_target_arr,
                                                                X_test=test_dataframe,
                                                                y_test=test_target_arr,  
-                                                               base_accuracy=self.model_trainer_artifact.model_accuracy,
+                                                               base_accuracy=self.model_trainer_artifact.model_f1_score,
                                                                )
             logging.info(f"Model evaluation completed. model metric artifact: {metric_info_artifact}")
 

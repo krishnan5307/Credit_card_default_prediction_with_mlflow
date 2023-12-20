@@ -22,7 +22,7 @@ columns:
   PAY_AMT4: float
   PAY_AMT5: float
   PAY_AMT6: float
-  default.payment.next.month: int
+  default_payment_next_month: int
 
 
 columns_input:
@@ -79,7 +79,7 @@ numerical_columns:
 categorical_columns:
  
 
-target_column: default.payment.next.month
+target_column: default_payment_next_month
 
 # domain_value:
 #   sex:
@@ -95,5 +95,5 @@ target_column: default.payment.next.month
 #     - northeast 
 
 TARGET_COLUMN:
-  name: default.payment.next.month
+  name: default_payment_next_month
   
