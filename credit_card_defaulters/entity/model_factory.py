@@ -2,6 +2,7 @@ from cmath import log
 import importlib
 from pyexpat import model
 import numpy as np
+import pandas as pd
 import yaml
 from credit_card_defaulters.exception import CreditException
 import os
@@ -134,6 +135,14 @@ def evaluate_classification_model(model_list: list, X_train:np.ndarray, y_train:
             # Getting predictions for training and testing dataset
             y_train_pred = model.predict(X_train)
             y_test_pred = model.predict(X_test)
+            
+            # ## To chcek unique values in predictions
+            # print(y_train_pred)
+            # # Convert to DataFrame
+            # df_from_array = pd.DataFrame(y_train_pred, columns=['prediction'])
+            # distinct_values = df_from_array['prediction'].unique()
+            # print(distinct_values)
+
 
             # Calculating precision, recall, and F1 score on training and testing dataset
             train_precision = precision_score(y_train, y_train_pred, average='weighted')
@@ -355,6 +364,7 @@ class ModelFactory:
                 # model_obj_ref is  LogisticRegression now
                  
                 model = model_obj_ref() ## giving parenthesis to make syntax it a function model
+                print(model)
                 
                 # logistic_regression_model = LogisticRegression()
                 # Create an instance of the LogisticRegression class
@@ -370,10 +380,11 @@ class ModelFactory:
                     model_obj_property_data = dict(model_initialization_config[PARAM_KEY])
                     model = ModelFactory.update_property_of_class(instance_ref=model,  ## now model is updated with gicen params: fit_interpct =True
                                                                   property_data=model_obj_property_data)
-
+                    print(model)
                 param_grid_search = model_initialization_config[SEARCH_PARAM_GRID_KEY]
                 
                 model_name = f"{model_initialization_config[MODULE_KEY]}.{model_initialization_config[CLASS_KEY]}" ## to string
+                print(model_name)
                 # eg: sklearn.linear_model.LogisticRegression
                 model_initialization_config = InitializedModelDetail(model_serial_number=model_serial_number,
                                                                      model=model,

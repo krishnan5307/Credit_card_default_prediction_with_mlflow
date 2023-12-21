@@ -10,8 +10,8 @@ from credit_card_defaulters.entity.model_factory import MetricInfoArtifact, Mode
 from credit_card_defaulters.entity.model_factory import evaluate_classification_model, evaluate_regression_model
 
 
-
-class PremiumEstimatorModel:
+## final model structure
+class CreditDefaultModel:
     def __init__(self, preprocessing_object, trained_model_object):  ## for feature engg the dataset and model training with dataset
         """
         TrainedModel constructor
@@ -29,13 +29,25 @@ class PremiumEstimatorModel:
         
         """
         try:
-            
+            print(f"model_name: {self.trained_model_object}")
+            print(f"functions in model: {dir(self.trained_model_object)}")
             transformed_feature = self.preprocessing_object.transform(X)
             return self.trained_model_object.predict(transformed_feature)
         except Exception as e:
             print("prediction  and model evaluation failed")
             print(e)
             raise CreditException(e, sys) from e    
+    
+    def predict_proba(self, X):
+        try:
+            print(f"model_name: {self.trained_model_object}")
+            transformed_feature = self.preprocessing_object.transform(X)
+            return self.trained_model_object.predict_proba(transformed_feature)
+        except Exception as e:
+            print("prediction  and model evaluation failed")
+            print(e)
+            raise CreditException(e, sys) from e    
+    
 
     def __repr__(self):
         return f"{type(self.trained_model_object).__name__}()"
@@ -106,6 +118,7 @@ class ModelTrainer:
             grid_searched_best_model_list:List[GridSearchedBestModel]=model_factory.grid_searched_best_model_list
             ## extraciting model data seperately into list
             model_list = [model.best_model for model in grid_searched_best_model_list ]
+            print(f"model_list from  grid_searched_best_model_list: {model_list}")
             logging.info(f"Evaluation all trained model on training and testing dataset both")
             metric_info:MetricInfoArtifact = evaluate_classification_model(model_list=model_list,
                                                                         X_train=x_train,
@@ -129,11 +142,11 @@ class ModelTrainer:
 
             trained_model_file_path=self.model_trainer_config.trained_model_file_path
             ## we now save the model with both prep_obj and model in  PremiumEstimatorModel() class
-            premium_model = PremiumEstimatorModel(preprocessing_object=preprocessing_obj,trained_model_object=model_object) 
+            credit_model = CreditDefaultModel(preprocessing_object=preprocessing_obj,trained_model_object=model_object) 
             ## Housing model is final for deploying in prodution
             logging.info(f"Saving model at path: {trained_model_file_path}")    
             ## saving both preprocessing obj and model obj together as final housing obj
-            save_object(file_path=trained_model_file_path,obj=premium_model)
+            save_object(file_path=trained_model_file_path,obj=credit_model)
 
 
             # model_trainer_artifact=  ModelTrainerArtifact(is_trained=True,message="Model Trained successfully",

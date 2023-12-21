@@ -11,7 +11,7 @@ import json
 from credit_card_defaulters.config.configuration import Configuartion
 from credit_card_defaulters.constant import CONFIG_DIR, get_current_time_stamp
 from credit_card_defaulters.pipeline.pipeline import Pipeline
-from credit_card_defaulters.entity.premium_predictor import CreditPredictor, CreditData
+from credit_card_defaulters.entity.premium_predictor import  CreditData, CreditPredictor
 from flask import send_file, abort, render_template
 
 
@@ -130,18 +130,23 @@ def predict():
         
         credit_df = credit_data.get_credit_input_data_frame() ## calling function inside hosuing class
         credit_predictor = CreditPredictor(model_dir=MODEL_DIR)      ## creating an object with intialization as model_dir
-        defaulter_status = credit_predictor.predict(X=credit_df)   ## using the above obj to do preiction
-        defaulter_stat= int(defaulter_status)
+        defaulter_cla = credit_predictor.predict(X=credit_df)   ## calling fucntion in that using CreditPredictor class, the above obj to do preiction
+        print(f"output of predicetd model: {defaulter_cla}")
+        defaulter_class = defaulter_cla[0,1]*100 ## accessing 1st row and 2nd column in 2d numpy array
+    # defaulter_stat= int(defaulter_status)
         ## converting defaulter status into readable form now 
-        defaulter = {1:"Default payment (Yes, the customer defaulted)", 0:"No default payment (No, the customer did not default)"}
+    # defaulter = {1:"Default payment (Yes, the customer defaulted)", 0:"No default payment (No, the customer did not default)"}
         ## Now we need to pass the results predicted back to the HTML via context- Thats why predict.html has 2 sections
         ## one to take the input for predciton asn next section to show the predcited output
         ## initially context value will be None before submitting form and  context value will update to 
         ## below after predciting the value .
         context = {
             CREDIT_DATA_KEY: credit_data.get_credit_data_as_dict(), ## FOR PASSING TO HTML PAGE VIA CONTEXT
-            CREDIT_VALUE_KEY: defaulter[defaulter_stat],
+            CREDIT_VALUE_KEY: round(defaulter_class, 3) #int(defaulter_class*100) 
+            ###  defaulter[defaulter_stat],
         }
+        print(f"probability of user being defaulter: {round(defaulter_class, 3)}%")  
+        ## 
         return render_template('predict.html', context=context)
     return render_template("predict.html", context=context)     ## to display html when  '/predict'
 

@@ -132,7 +132,7 @@ class CreditPredictor:
         try:
             model_path = self.get_latest_model_path()      ## from saved model folder
             model = load_object(file_path=model_path)
-            expenses = model.predict(X)
-            return expenses
+            defaulter_class = model.predict_proba(X)
+            return defaulter_class
         except Exception as e:
             raise CreditException(e, sys) from e

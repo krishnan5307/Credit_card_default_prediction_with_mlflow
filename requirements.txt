@@ -1,3 +1,5 @@
+Flask==2.2.2
+Werkzeug==2.2.3
 evidently
 pandas 
 mlflow 
@@ -12,7 +14,6 @@ tqdm
 ensure==1.0.2 
 joblib 
 types-PyYAML 
-Flask 
 Flask-Cors
 setuptools
 gunicorn
@@ -25,3 +26,4 @@ pathlib
 cassandra-driver
 ## configbox = if we pass dict in this, we can direclty call keys by dict_name.keyname, 
 ## ensure annotation - if user pass diff datatype , it thorws error 
+# docker run -p 5000:5000 -e PORT=5000 645b632760bb
