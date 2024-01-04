@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-import os
+import os, sys
 import pandas as pd
 from credit_card_defaulters.constant import get_current_time_stamp 
 LOG_DIR="logs"
@@ -14,13 +14,60 @@ os.makedirs(LOG_DIR,exist_ok=True)
 
 LOG_FILE_PATH = os.path.join(LOG_DIR,LOG_FILE_NAME)
 
+## defining the logging
 
-
-logging.basicConfig(filename=LOG_FILE_PATH,
+logging.basicConfig(#filename=LOG_FILE_PATH,
 filemode="w",
 format='[%(asctime)s]^;%(levelname)s^;%(lineno)d^;%(filename)s^;%(funcName)s()^;%(message)s',
 level=logging.INFO
 )
+
+
+# Create a FileHandler and add it to the root logger
+file_handler = logging.FileHandler(LOG_FILE_PATH)  ## defining handler to a variable
+formatter = logging.Formatter('[%(asctime)s]^;%(levelname)s^;%(lineno)d^;%(filename)s^;%(funcName)s()^;%(message)s')
+file_handler.setFormatter(formatter)  ## passing loggin format to filehandler using setFormatter()
+logging.getLogger().addHandler(file_handler)  # adding this filehandler to logging 
+
+# Create a StreamHandler and add it to the root logger
+stream_handler = logging.StreamHandler(sys.stdout) ## defining handler to a variable
+stream_handler.setFormatter(formatter) ## passing loggin format to Streamhandler using setFormatter()
+logging.getLogger().addHandler(stream_handler) # adding this streamhandler to logging 
+
+
+"""
+
+If you want to add multiple handlers to the logging configuration, including both a FileHandler for writing to a file and a StreamHandler for printing log messages to the console, you can modify the code as follows:
+
+python
+Copy code
+import logging
+import sys
+
+LOG_FILE_PATH = "example.log"
+
+logging.basicConfig(
+    filename=LOG_FILE_PATH,
+    filemode="w",
+    format='[%(asctime)s]^;%(levelname)s^;%(lineno)d^;%(filename)s^;%(funcName)s()^;%(message)s',
+    handlers=[
+        logging.FileHandler(LOG_FILE_PATH),           # FileHandler for writing to a file
+        logging.StreamHandler(sys.stdout)             # StreamHandler for printing to the console
+    ],
+    level=logging.INFO
+)
+Explanation:
+
+handlers parameter:
+
+The handlers parameter is now a list containing both a FileHandler and a StreamHandler.
+logging.FileHandler(LOG_FILE_PATH) adds a handler that writes log messages to the specified file (example.log).
+logging.StreamHandler(sys.stdout) adds a handler that writes log messages to the console (stdout).
+StreamHandler(sys.stdout) for console output:
+
+The StreamHandler is used for printing log messages to the console (sys.stdout). You can customize this part based on where you want to output log messages.
+"""
+
 ## if u need to get dataframe of log
 def get_log_dataframe(file_path) -> pd.DataFrame:
     data=[]
