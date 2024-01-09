@@ -3,6 +3,8 @@
 
 # End-to-end-Machine-Learning-Project-with-MLflow
 
+The ml model predicts the probability of user being a credit card defaulter based on tbe histiry of user data 
+
 
 ## Workflows
 
