@@ -13,8 +13,10 @@ from credit_card_defaulters.constant import CONFIG_DIR, get_current_time_stamp
 from credit_card_defaulters.pipeline.pipeline import Pipeline
 from credit_card_defaulters.entity.premium_predictor import  CreditData, CreditPredictor
 from flask import send_file, abort, render_template
+from urllib.parse import urlparse
+from dotenv import load_dotenv
 
-
+import mlflow
 
 ROOT_DIR = os.getcwd()
 LOG_FOLDER_NAME = "logs"
@@ -30,6 +32,16 @@ from credit_card_defaulters.logger import get_log_dataframe
 
 CREDIT_DATA_KEY = "credit_data"
 CREDIT_VALUE_KEY = "defaulter_status"
+
+MLFLOW_URI = "https://dagshub.com/krishnan5307/Credit_card_default_prediction_with_mlflow.mlflow"
+
+
+## mlflow setup for main entry point python file ...here app.py , so it will run as long as application runs
+mlflow.set_registry_uri(MLFLOW_URI)
+tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+
+# Load mlflow environment variables from configuration file
+load_dotenv('mlflow.env')
 
 app = Flask(__name__)
 
@@ -179,7 +191,33 @@ def saved_models_dir(req_path):
 
 
 
-
+## by declaring __main__: method we can execute the python code under the main method- by direct all eg: app.py
+## so here in below file when app.py gets executed, 
+## 1. load_dotenv('mlflow.env')
+## 2. MLFLOW_URI = os.getenv("MLFLOW_TRACKING_URI")
+   # setting up the mlflow regirsty with our tracking uri 
+   # mlflow.set_registry_uri(MLFLOW_URI)
+   # tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+## 3. app.run(debug=True) gets executed, so the application with name app runs 
 
 if __name__ == "__main__":
+    # Load mlflow environment variables from configuration file into os env 
+    load_dotenv('mlflow.env')
+   # Access environment variables "key" using os.getenv to fetch "value"
+    MLFLOW_URI = os.getenv("MLFLOW_TRACKING_URI")
+   # setting up the mlflow regirsty with our tracking uri 
+    mlflow.set_registry_uri(MLFLOW_URI)
+    tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+
+    # os.environ["MLFLOW_TRACKING_URI"]=""
+    # os.environ["MLFLOW_TRACKING_USERNAME"]=""
+    # os.environ["MLFLOW_TRACKING_PASSWORD"]=""
     app.run(debug=True)
+
+
+    # # Load mlflow environment variables from configuration file
+    # load_dotenv('.env')  # Assuming your file is named '.env'
+    
+
+
+    # mlflow.set_registry_uri(MLFLOW_URI)

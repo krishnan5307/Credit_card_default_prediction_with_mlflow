@@ -115,3 +115,8 @@ EXPERIMENT_FILE_NAME="experiment.csv"
 
 CASSANDRA_KEYSPACE = "credit_card"
 CASSANDRA_TABLE = "UCI_Credit_Card"
+
+## model factory mlflow related varaibles
+
+MODEL_FACTORY_CONFIG_KEY = "model_factory_config"
+MODEL_FACTORY_MLFLOW_URI_KEY = "mlflow_uri"  

@@ -37,3 +37,6 @@ model_evaluation_config:
 
 model_pusher_config:
   model_export_dir: saved_models
+
+model_factory_config:
+  mlflow_uri: https://dagshub.com/krishnan5307/Credit_card_default_prediction_with_mlflow.mlflow

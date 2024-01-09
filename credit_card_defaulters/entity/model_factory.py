@@ -7,6 +7,8 @@ import yaml
 from credit_card_defaulters.exception import CreditException
 import os
 import sys
+import mlflow
+from mlflow.models.signature import infer_signature
 
 from collections import namedtuple
 from typing import List
@@ -15,8 +17,7 @@ from sklearn.metrics import r2_score,mean_squared_error
 from credit_card_defaulters.constant import *
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, roc_auc_score, roc_curve, auc
-
-
+# import config_entity
 
 
 InitializedModelDetail = namedtuple("InitializedModelDetail",
@@ -187,6 +188,31 @@ def evaluate_classification_model(model_list: list, X_train:np.ndarray, y_train:
             logging.info(f"auc_roc: [{roc_auc}].")
             logging.info(f"auc_value: [{auc_value}].")
 
+
+       ## adding mlflow tracking service for parameters snd models
+
+            with mlflow.start_run(run_name=model_name):
+
+              #  mlflow.log_params()
+
+                mlflow.log_metric("Diff test train accuracy", diff_test_train_acc)
+                mlflow.log_metric("Train precision", train_precision)
+                mlflow.log_metric("Test precision", test_precision)
+                mlflow.log_metric("Train recall", train_recall)
+                mlflow.log_metric("Test recall", test_recall)
+                mlflow.log_metric("model_f1_score", model_f1_score)
+                mlflow.log_metric("auc_value", auc_value)
+                mlflow.log_metric("auc_roc", roc_auc)
+
+
+                # Save model
+               # mlflow.sklearn.log_model(model, "model")
+
+                # Save custom artifact
+              #  artifact_path = "custom_metrics"
+              #  mlflow.log_artifact(str(metric_info_artifact), artifact_path)
+                mlflow.end_run()
+
              ## Two criterias to accept model
             #if model accuracy is greater than base accuracy and train and test score is within certain thershold
             #we will accept that model as accepted model
@@ -342,7 +368,38 @@ class ModelFactory:
                                                              best_parameters=grid_search_cv.best_params_,
                                                              best_score=grid_search_cv.best_score_
                                                              )
+            # using mlflow tracking serivve for all models and its best params from GridCV
             
+            with mlflow.start_run(run_name=initialized_model.model_name):                                                
+                                    
+                        #  mlflow.log_params(grid_search_cv.best_params_)
+                        #  mlflow.log_param(grid_search_cv.best_score_)
+                        #  mlflow.log_params(grid_search_cv.best_estimator_)
+                         mlflow.log_param("model_serial_number", initialized_model.model_serial_number)
+                         mlflow.log_params(grid_search_cv.best_params_)
+                         mlflow.log_param("best_score", grid_search_cv.best_score_)
+                         mlflow.log_params(grid_search_cv.best_estimator_.get_params())
+
+                        #  mlflow.log_metric("rmse", rmse)
+                        #  mlflow.log_metric("r2", r2)
+                        #  mlflow.log_metric("mae", mae)
+
+                        # Save model
+                     #    mlflow.sklearn.log_model(initialized_model, "model")
+                         # Log model signature
+                         #signature = infer_signature(initialized_model.model)
+                      #   mlflow.sklearn.log_model(initialized_model.model, "model", signature=signature)
+
+
+                        # Save custom artifact
+                       #  artifact_path = "custom_metrics"
+                       #  mlflow.log_artifact(str(metric_info_artifact), artifact_path)
+ 
+
+
+
+            
+
             return grid_searched_best_model
         except Exception as e:
             raise CreditException(e, sys) from e

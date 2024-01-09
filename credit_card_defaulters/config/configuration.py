@@ -1,6 +1,6 @@
 
 from credit_card_defaulters.entity.config_entity import DataIngestionConfig, DataTransformationConfig,DataValidationConfig,   \
-ModelTrainerConfig,ModelEvaluationConfig,ModelPusherConfig,TrainingPipelineConfig
+ModelTrainerConfig,ModelEvaluationConfig,ModelPusherConfig,TrainingPipelineConfig, ModelFactoryConfig
 from credit_card_defaulters.util.util import read_yaml_file
 from credit_card_defaulters.logger import logging
 import sys,os
@@ -240,3 +240,13 @@ class Configuartion:                  ## The strucutre definition of entity clas
             return training_pipeline_config
         except Exception as e:
             raise CreditException(e,sys) from e
+        
+    def get_model_factory_config(self) -> ModelFactoryConfig:
+        try:
+            model_factory_config = self.config_info[MODEL_FACTORY_CONFIG_KEY]
+            mlflow_uri = model_factory_config[MODEL_FACTORY_MLFLOW_URI_KEY]
+            model_factory_config = ModelFactoryConfig(mlflow_uri=mlflow_uri)
+            logging.info(F"model factory config: {model_factory_config}")
+            return model_factory_config
+        except Exception as e:
+            raise CreditException(e,sys) from e 

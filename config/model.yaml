@@ -84,6 +84,10 @@ model_selection:
         - 0.5
         - 1.0
 
+
+
+
+
  ## These models below are not used as they dont have a predict_proba() function to return probability of classes. eg: percentages/fraction in btw 0 and 1
  ## they only have predict() function that returns target classes in which user data belongs . eg: 0 or 1 here    
   
