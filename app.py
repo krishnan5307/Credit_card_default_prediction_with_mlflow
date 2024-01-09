@@ -214,10 +214,12 @@ if __name__ == "__main__":
     # os.environ["MLFLOW_TRACKING_PASSWORD"]=""
     app.run(debug=True)
 
+"""
+if u want to set port and host to a specfic valid custom setting u can do that like this in __main__ method
 
-    # # Load mlflow environment variables from configuration file
-    # load_dotenv('.env')  # Assuming your file is named '.env'
-    
+if __name__ == "__main__":
+    port = 5000
+    host = '0.0.0.0'
+    app.run(debug=True, host=host, port=port)
 
-
-    # mlflow.set_registry_uri(MLFLOW_URI)
+"""
