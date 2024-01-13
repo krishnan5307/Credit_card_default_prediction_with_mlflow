@@ -167,6 +167,7 @@ cython_debug/
 .json
 .html
 
-mlruns/*
-model_objects/*
-model/*
+mlruns/
+model_objects/
+model/
+artifact/

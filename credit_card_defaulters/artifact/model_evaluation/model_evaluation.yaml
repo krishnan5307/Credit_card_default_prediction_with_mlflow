@@ -1,7 +1,0 @@
-best_model:
-  model_path: C:\data science\Internship projects\credit card defaulters\Credit_card_default_prediction_with_mlflow\credit_Card_defaulters\artifact\model_trainer\2024-01-14-00-10-41\trained_model\model.pkl
-history:
-  2024-01-14-00-02-39:
-    model_path: C:\data science\Internship projects\credit card defaulters\Credit_card_default_prediction_with_mlflow\credit_Card_defaulters\artifact\model_trainer\2024-01-13-23-58-19\trained_model\model.pkl
-  2024-01-14-00-10-41:
-    model_path: C:\data science\Internship projects\credit card defaulters\Credit_card_default_prediction_with_mlflow\credit_Card_defaulters\artifact\model_trainer\2024-01-14-00-02-39\trained_model\model.pkl
