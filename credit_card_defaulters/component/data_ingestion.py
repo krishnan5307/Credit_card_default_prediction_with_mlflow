@@ -42,7 +42,9 @@ class DataIngestion:
             # df = df.reset_index(drop=True).fillna(pd.np.nan)
             #df = configuration.start()
 
-            df = self.database_connection.get_configuration()
+          #  df = self.database_connection.get_configuration()
+            df = pd.read_csv(r"C:\\data science\\Internship projects\\credit card defaulters\\Credit_card_default_prediction_with_mlflow\\dataset\\dataset.csv")
+            print("successfully fetached data from CSV in local")
             ## removing first ID column now itself
             df.drop("ID", axis=1, inplace=True)
 

@@ -1,0 +1,8 @@
+mlflow<3,>=2.2
+cloudpickle==2.2.1
+credit-card-defaulters==0.0.1
+numpy==1.24.4
+pandas==2.0.3
+pyyaml==6.0.1
+scikit-learn==1.0.2
+scipy==1.11.1

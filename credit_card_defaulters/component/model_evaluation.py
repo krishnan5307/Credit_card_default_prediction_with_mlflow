@@ -6,7 +6,7 @@ from credit_card_defaulters.entity.config_entity import ModelEvaluationConfig
 from credit_card_defaulters.entity.artifact_entity import DataIngestionArtifact,DataValidationArtifact,ModelTrainerArtifact,ModelEvaluationArtifact
 from credit_card_defaulters.constant import *
 import numpy as np
-import os
+import os, mlflow
 import sys
 from credit_card_defaulters.util.util import write_yaml_file, read_yaml_file, load_object,load_data
 from credit_card_defaulters.entity.model_factory import evaluate_classification_model, evaluate_regression_model
@@ -146,6 +146,7 @@ class ModelEvaluation:
             ## Now if there was no model earlier in production we need to evaluate new model with 
             ## previous best model in prodcution - evalutiton
             model_list = [model, trained_model_object]
+           
             ## now we do the same model evaltuion we did during model trainig with bunch of model as list
             ## ## gives best model of 2 in model_list
             metric_info_artifact = evaluate_classification_model(model_list=model_list,      

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/60bcdcfeb2134210ad307850d3ae190d/artifacts
+end_time: 1705132764397
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 60bcdcfeb2134210ad307850d3ae190d
+run_name: dashing-wolf-289
+run_uuid: 60bcdcfeb2134210ad307850d3ae190d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1705132756076
+status: 4
+tags: []
+user_id: krish

@@ -3,7 +3,7 @@ from typing import List
 
 #Declaring variables for setup functions
 PROJECT_NAME="credit_card_defaulters"
-VERSION="0.0.1"                         ## this version of package will get installed using "-e ." through requirements.txt file run
+VERSION="0.0.2"                         ## this version of package will get installed using "-e ." through requirements.txt file run
 AUTHOR="krishnanunni_br"
 DESRCIPTION="This is a credit card defaulters prediction Machine Learning Project"
 REQUIREMENT_FILE_NAME="requirements.txt"

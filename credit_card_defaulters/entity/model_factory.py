@@ -6,10 +6,10 @@ import pandas as pd
 import yaml
 from credit_card_defaulters.exception import CreditException
 import os
-import sys
-import mlflow
+import sys, joblib
+import mlflow, mlflow.sklearn
 from mlflow.models.signature import infer_signature
-
+from urllib.parse import urlparse
 from collections import namedtuple
 from typing import List
 from credit_card_defaulters.logger import logging
@@ -17,8 +17,13 @@ from sklearn.metrics import r2_score,mean_squared_error
 from credit_card_defaulters.constant import *
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, roc_auc_score, roc_curve, auc
+# MLFLOW_TRACKING_URI= "https://dagshub.com/krishnan5307/Credit_card_default_prediction_with_mlflow.mlflow"
+# mlflow.set_registry_uri(MLFLOW_TRACKING_URI)
+
+
 # import config_entity
 
+tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
 InitializedModelDetail = namedtuple("InitializedModelDetail",
                                     ["model_serial_number", "model", "param_grid_search", "model_name"])
@@ -82,164 +87,323 @@ def evaluate_classification_model(model_list: list, X_train:np.ndarray, y_train:
                                  "test_accuracy", "model_accuracy", "index_number"])
 
     """
-    try:
+
+
+
+    """
+    for model_instance in model_list:
+    if isinstance(model_instance, GridSearchedBestModel):
+        print("model_instance is an instance of GridSearchedBestModel")
+    else:
+        print("model_instance is not an instance of GridSearchedBestModel")
+    """
+    try:     
         
-    
-        index_number = 0 ## for model index
-        metric_info_artifact = None
-        for model in model_list:
-            model_name = str(model)  #getting model name based on model object
-            logging.info(f"{'>>'*30}Started evaluating model: [{type(model).__name__}] {'<<'*30}")
+        ## for model training where we pass the original GridSearchedBestModel list which contain best_estimator, best_score,best_params etc
+        if all(isinstance(item, GridSearchedBestModel) for item in model_list):
+            logging.info(f"{'>>'*30}Started GridSearchedBestModel list training: [{model_list}] {'<<'*30}")
+
+                        
             
-            """
-            #Getting prediction for training and testing dataset
-            y_train_pred = model.predict(X_train)
-            y_test_pred = model.predict(X_test)
+            with mlflow.start_run(run_name="All Trained Models"):
+                try:
+                    
+                    model = None
+                    index_number = 0 ## for model index
+                    metric_info_artifact = None
+                    for mod in model_list: 
+                        model = mod.best_model
+                        model_name = str(model)  #getting model name based on model object
+                        logging.info(f"{'>>'*30}Started evaluating model: [{type(model).__name__}] {'<<'*30}")
 
-            #Calculating r squared score on training and testing dataset
-            train_acc = r2_score(y_train, y_train_pred)
-            test_acc = r2_score(y_test, y_test_pred)
+                        y_train_pred = model.predict(X_train)
+                        y_test_pred = model.predict(X_test)
+                        
+                        # ## To chcek unique values in predictions
+                        # print(y_train_pred)
+                        # # Convert to DataFrame
+                        # df_from_array = pd.DataFrame(y_train_pred, columns=['prediction'])
+                        # distinct_values = df_from_array['prediction'].unique()
+                        # print(distinct_values)
+
+
+                        # Calculating precision, recall, and F1 score on training and testing dataset
+                        train_precision = precision_score(y_train, y_train_pred, average='weighted')
+                        test_precision = precision_score(y_test, y_test_pred, average='weighted')
+
+                        train_recall = recall_score(y_train, y_train_pred, average='weighted')
+                        test_recall = recall_score(y_test, y_test_pred, average='weighted')
+
+                        train_f1_score = f1_score(y_train, y_train_pred, average='weighted')
+                        test_f1_score = f1_score(y_test, y_test_pred, average='weighted')
+
+                        # Calculating accuracy on training and testing dataset
+                        train_accuracy = accuracy_score(y_train, y_train_pred)
+                        test_accuracy = accuracy_score(y_test, y_test_pred)
+
+                        # Calculating harmonic mean of train_f1_score and test_f1_score
+                        model_f1_score = (2 * (train_f1_score * test_f1_score)) / (train_f1_score + test_f1_score)
+
+                        # Calculating AUC-ROC and ROC score
+                        fpr, tpr, _ = roc_curve(y_test, y_test_pred)
+                        roc_auc = auc(fpr, tpr)
+                        auc_value = roc_auc_score(y_test, y_test_pred)
+
+                        # Calculate the absolute difference between test_accuracy and train_accuracy
+                        diff_test_train_acc = abs(test_accuracy - train_accuracy)            
+
+
+                        
+                        #logging all important metric
+                        logging.info(f"{'>>'*30} Score {'<<'*30}")
+                        logging.info(f"Train acc Score\t\t Test acc Score\t\t model avg Score")
+                        logging.info(f"{train_accuracy}\t\t {test_accuracy}\t\t{model_f1_score}")
+
+                        logging.info(f"{'>>'*30} Loss {'<<'*30}")
+                        logging.info(f"Diff test train accuracy: [{diff_test_train_acc}].") 
+                        logging.info(f"Train precision: [{train_precision}].")
+                        logging.info(f"Test precision: [{test_precision}].")
+                        logging.info(f"Train recall: [{train_recall}].")
+                        logging.info(f"Test recall: [{test_recall}].")
+                        logging.info(f"Train f1_score: [{train_f1_score}].")
+                        logging.info(f"model_f1_score: [{model_f1_score}].")
+                        logging.info(f"auc_roc: [{roc_auc}].")
+                        logging.info(f"auc_value: [{auc_value}].")
+                        
+                        print(model)
+                        # Save the trained model locally
+                        model_obj_path = "C:\\data science\\Internship projects\\credit card defaulters\\Credit_card_default_prediction_with_mlflow\\model_objects"
+                        # Your directory path
+                       # creating file path
+                        file_path = os.path.join(model_obj_path, f"{model_name}.joblib")
+                        with open(file_path, 'wb') as file:
+                            joblib.dump(model, file)
+                        model_path = file_path   
+                        loaded_model = joblib.load(model_path)
+                        # Confirm the loaded_model type
+                        print(type(loaded_model)) 
+
+                       ## adding mlflow tracking service for parameters snd models
+
+                        with mlflow.start_run(run_name=model_name, nested=True):
+                            try:
+                                    #  mlflow.log_params() 
+
+                                mlflow.log_metric("Diff test train accuracy", diff_test_train_acc)
+                                mlflow.log_metric("Train precision", train_precision)
+                                mlflow.log_metric("Test precision", test_precision)
+                                mlflow.log_metric("Train recall", train_recall)
+                                mlflow.log_metric("Test recall", test_recall)
+                                mlflow.log_metric("model_f1_score", model_f1_score)
+                                mlflow.log_metric("auc_value", auc_value)
+                                mlflow.log_metric("auc_roc", roc_auc)
+
+                                
+
+                                #  mlflow.sklearn.log_model( "model", mod.model)
+                                mlflow.log_metric("model_best_score", mod.best_score)
+                                mlflow.log_param("model_serial_number", mod.model_serial_number)
+                                mlflow.log_params(mod.best_parameters)
+
+                                if tracking_url_type_store != "file":
+                                    print(f"tracking_url_type_store in training call: {tracking_url_type_store}")
+                                    # Register the model
+                                    # There are other ways to use the Model Registry, which depends on the use case,
+                                    # please refer to the doc for more information:
+                                    # https://mlflow.org/docs/latest/model-registry.html#api-workflow
+                                    mlflow.sklearn.log_model(model, model_name, registered_model_name= model_name)
+                                else:
+                                    mlflow.sklearn.log_model(model, "model")                                    
+                            finally:
+                                pass
+                                # mlflow.end_run()
+                        ## Two criterias to accept model
+                        #if model accuracy is greater than base accuracy and train and test score is within certain thershold
+                        #we will accept that model as accepted model
+                        if model_f1_score >= base_accuracy and diff_test_train_acc < 0.05 and auc_value >0:
+                            base_accuracy = model_f1_score
+                            metric_info_artifact = MetricInfoArtifact(model_name=model_name,
+                                                                    model_object=model,
+                                                                    train_precision=train_precision,
+                                                                    test_precision=test_precision,
+                                                                    train_recall=train_recall,
+                                                                    test_recall=test_recall,
+                                                                    train_f1_score=train_f1_score,   
+                                                                    test_f1_score=test_f1_score, 
+                                                                    model_f1_score =model_f1_score,
+                                                                    train_accuracy=train_accuracy,
+                                                                    test_accuracy=test_accuracy,
+                                                                    auc_roc= roc_auc, auc_value=auc_value,                                                    
+                                                                    index_number=index_number)
+                            ## index of model added if satisy the criteria
+                            logging.info(f"Acceptable model found {metric_info_artifact}. ")
+                        index_number += 1  ## index of each model to add it in as model index if satisy the criteria
+                    if metric_info_artifact is None:
+                        logging.info(f"No model found with higher accuracy than base accuracy")
+                    return metric_info_artifact  ## will return only one model with these two conditions base_acc and diff_test_train_acc
+                except Exception as e:
+                    print(e)
+                    raise CreditException(e, sys) from e
+
+
+
+                # finally:
+                #     mlflow.end_run()
+
+
+
+
+
+        else:
             
-            #Calculating mean squared error on training and testing dataset
-            train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
-            test_rmse = np.sqrt(mean_squared_error(y_test, y_test_pred))
-
-            # Calculating harmonic mean of train_accuracy and test_accuracy
-            model_accuracy = (2 * (train_acc * test_acc)) / (train_acc + test_acc)
-            diff_test_train_acc = abs(test_acc - train_acc)
-
-            """
-            #     # Getting predictions for training and testing dataset
-            # y_train_pred = model.predict(X_train)
-            # y_test_pred = model.predict(X_test)
-
-            # # Calculating precision, recall, and F1 score on training and testing dataset
-            # train_precision = precision_score(y_train, y_train_pred, average='weighted')
-            # test_precision = precision_score(y_test, y_test_pred, average='weighted')
-
-            # train_recall = recall_score(y_train, y_train_pred, average='weighted')
-            # test_recall = recall_score(y_test, y_test_pred, average='weighted')
-
-            # train_f1_score = f1_score(y_train, y_train_pred, average='weighted')
-            # test_f1_score = f1_score(y_test, y_test_pred, average='weighted')
-
-            # # Calculating accuracy on training and testing dataset
-            # train_accuracy = accuracy_score(y_train, y_train_pred)
-            # test_accuracy = accuracy_score(y_test, y_test_pred)
-
-            # # Calculating harmonic mean of train_accuracy and test_accuracy
-            # model_accuracy = (2 * (train_accuracy * test_accuracy)) / (train_accuracy + test_accuracy)
-
-            # # Calculate the absolute difference between test_accuracy and train_accuracy
-            # diff_test_train_acc = abs(test_accuracy - train_accuracy)
-
-            # Getting predictions for training and testing dataset
-            y_train_pred = model.predict(X_train)
-            y_test_pred = model.predict(X_test)
-            
-            # ## To chcek unique values in predictions
-            # print(y_train_pred)
-            # # Convert to DataFrame
-            # df_from_array = pd.DataFrame(y_train_pred, columns=['prediction'])
-            # distinct_values = df_from_array['prediction'].unique()
-            # print(distinct_values)
+            ## for model evaluation where pass only list of models of type gridSearchBestmodel.best_model
+            with mlflow.start_run(run_name="Latest Evaluated models to be selected to production"):
+                try:
+                    model = None
+                    index_number = 0 ## for model index
+                    metric_info_artifact = None
+                    for model in model_list: ## .pkl file models loaded from trained models folder,(current model and previous best model )
+                        
+                        model_name = str(model)  #getting model name based on model object
+                        logging.info(f"{'>>'*30}Started evaluating model: [{type(model).__name__}] {'<<'*30}")
+                        y_train_pred = model.predict(X_train)
+                        y_test_pred = model.predict(X_test)
+                        
+                        # ## To chcek unique values in predictions
+                        # print(y_train_pred)
+                        # # Convert to DataFrame
+                        # df_from_array = pd.DataFrame(y_train_pred, columns=['prediction'])
+                        # distinct_values = df_from_array['prediction'].unique()
+                        # print(distinct_values)
 
 
-            # Calculating precision, recall, and F1 score on training and testing dataset
-            train_precision = precision_score(y_train, y_train_pred, average='weighted')
-            test_precision = precision_score(y_test, y_test_pred, average='weighted')
+                        # Calculating precision, recall, and F1 score on training and testing dataset
+                        train_precision = precision_score(y_train, y_train_pred, average='weighted')
+                        test_precision = precision_score(y_test, y_test_pred, average='weighted')
 
-            train_recall = recall_score(y_train, y_train_pred, average='weighted')
-            test_recall = recall_score(y_test, y_test_pred, average='weighted')
+                        train_recall = recall_score(y_train, y_train_pred, average='weighted')
+                        test_recall = recall_score(y_test, y_test_pred, average='weighted')
 
-            train_f1_score = f1_score(y_train, y_train_pred, average='weighted')
-            test_f1_score = f1_score(y_test, y_test_pred, average='weighted')
+                        train_f1_score = f1_score(y_train, y_train_pred, average='weighted')
+                        test_f1_score = f1_score(y_test, y_test_pred, average='weighted')
 
-            # Calculating accuracy on training and testing dataset
-            train_accuracy = accuracy_score(y_train, y_train_pred)
-            test_accuracy = accuracy_score(y_test, y_test_pred)
+                        # Calculating accuracy on training and testing dataset
+                        train_accuracy = accuracy_score(y_train, y_train_pred)
+                        test_accuracy = accuracy_score(y_test, y_test_pred)
 
-            # Calculating harmonic mean of train_f1_score and test_f1_score
-            model_f1_score = (2 * (train_f1_score * test_f1_score)) / (train_f1_score + test_f1_score)
+                        # Calculating harmonic mean of train_f1_score and test_f1_score
+                        model_f1_score = (2 * (train_f1_score * test_f1_score)) / (train_f1_score + test_f1_score)
 
-            # Calculating AUC-ROC and ROC score
-            fpr, tpr, _ = roc_curve(y_test, y_test_pred)
-            roc_auc = auc(fpr, tpr)
-            auc_value = roc_auc_score(y_test, y_test_pred)
+                        # Calculating AUC-ROC and ROC score
+                        fpr, tpr, _ = roc_curve(y_test, y_test_pred)
+                        roc_auc = auc(fpr, tpr)
+                        auc_value = roc_auc_score(y_test, y_test_pred)
 
-            # Calculate the absolute difference between test_accuracy and train_accuracy
-            diff_test_train_acc = abs(test_accuracy - train_accuracy)            
-
-
-            
-            #logging all important metric
-            logging.info(f"{'>>'*30} Score {'<<'*30}")
-            logging.info(f"Train acc Score\t\t Test acc Score\t\t model avg Score")
-            logging.info(f"{train_accuracy}\t\t {test_accuracy}\t\t{model_f1_score}")
-
-            logging.info(f"{'>>'*30} Loss {'<<'*30}")
-            logging.info(f"Diff test train accuracy: [{diff_test_train_acc}].") 
-            logging.info(f"Train precision: [{train_precision}].")
-            logging.info(f"Test precision: [{test_precision}].")
-            logging.info(f"Train recall: [{train_recall}].")
-            logging.info(f"Test recall: [{test_recall}].")
-            logging.info(f"Train f1_score: [{train_f1_score}].")
-            logging.info(f"model_f1_score: [{model_f1_score}].")
-            logging.info(f"auc_roc: [{roc_auc}].")
-            logging.info(f"auc_value: [{auc_value}].")
+                        # Calculate the absolute difference between test_accuracy and train_accuracy
+                        diff_test_train_acc = abs(test_accuracy - train_accuracy)            
 
 
-       ## adding mlflow tracking service for parameters snd models
+                        
+                        #logging all important metric
+                        logging.info(f"{'>>'*30} Score {'<<'*30}")
+                        logging.info(f"Train acc Score\t\t Test acc Score\t\t model avg Score")
+                        logging.info(f"{train_accuracy}\t\t {test_accuracy}\t\t{model_f1_score}")
 
-            with mlflow.start_run(run_name=model_name):
+                        logging.info(f"{'>>'*30} Loss {'<<'*30}")
+                        logging.info(f"Diff test train accuracy: [{diff_test_train_acc}].") 
+                        logging.info(f"Train precision: [{train_precision}].")
+                        logging.info(f"Test precision: [{test_precision}].")
+                        logging.info(f"Train recall: [{train_recall}].")
+                        logging.info(f"Test recall: [{test_recall}].")
+                        logging.info(f"Train f1_score: [{train_f1_score}].")
+                        logging.info(f"model_f1_score: [{model_f1_score}].")
+                        logging.info(f"auc_roc: [{roc_auc}].")
+                        logging.info(f"auc_value: [{auc_value}].")
 
-              #  mlflow.log_params()
+                        ## adding mlflow tracking service for parameters snd models
 
-                mlflow.log_metric("Diff test train accuracy", diff_test_train_acc)
-                mlflow.log_metric("Train precision", train_precision)
-                mlflow.log_metric("Test precision", test_precision)
-                mlflow.log_metric("Train recall", train_recall)
-                mlflow.log_metric("Test recall", test_recall)
-                mlflow.log_metric("model_f1_score", model_f1_score)
-                mlflow.log_metric("auc_value", auc_value)
-                mlflow.log_metric("auc_roc", roc_auc)
+                        with mlflow.start_run(run_name=model_name, nested=True):
+                            try:
+                        # #             #  mlflow.log_params() 
 
+                                mlflow.log_metric("Diff test train accuracy", diff_test_train_acc)
+                                mlflow.log_metric("Train precision", train_precision)
+                                mlflow.log_metric("Test precision", test_precision)
+                                mlflow.log_metric("Train recall", train_recall)
+                                mlflow.log_metric("Test recall", test_recall)
+                                mlflow.log_metric("model_f1_score", model_f1_score)
+                                mlflow.log_metric("auc_value", auc_value)
+                                mlflow.log_metric("auc_roc", roc_auc)
+## we cannot log params in mlflow during model evaluaion stage as model is saved in training artifacts as gridsearchbestmodel.best_model
+# or in oother words gridsearchcv.best_estimator_ . so we load the model only and not gridsearchbestmodel.
+# so we dont have gridsearchbestmodel.best_params or best_score in this stage, but it was available in model traiing stage which is above code till line 215
+# where we used [gridsearchbestmodel] list of all initalised models 
+                              #  mlflow.sklearn.log_model(model, "model")
+                                # mlflow.log_metrics(model.best_score)
+                                # mlflow.log_param("model_serial_number", model.model_serial_number)
+                            # #     # mlflow.log_params(model.best_parameters)
+                                
+                                if tracking_url_type_store != "file":
+                                    print(f"tracking_url_type_store in model evalution call : {tracking_url_type_store}")
 
-                # Save model
-               # mlflow.sklearn.log_model(model, "model")
+                                    # Register the model
+                                    # There are other ways to use the Model Registry, which depends on the use case,
+                                    # please refer to the doc for more information:
+                                    # https://mlflow.org/docs/latest/model-registry.html#api-workflow
+                                    mlflow.sklearn.log_model(model, model_name, registered_model_name= model_name)
+                                else:
+                                    mlflow.sklearn.log_model(model, "model")                                 
+                            finally:
+                                pass
+                                # mlflow.end_run()
+                        ## Two criterias to accept model
+                        #if model accuracy is greater than base accuracy and train and test score is within certain thershold
+                        #we will accept that model as accepted model
+                        if model_f1_score >= base_accuracy and diff_test_train_acc < 0.05 and auc_value >0:
+                            base_accuracy = model_f1_score
+                            metric_info_artifact = MetricInfoArtifact(model_name=model_name,
+                                                                    model_object=model,
+                                                                    train_precision=train_precision,
+                                                                    test_precision=test_precision,
+                                                                    train_recall=train_recall,
+                                                                    test_recall=test_recall,
+                                                                    train_f1_score=train_f1_score,   
+                                                                    test_f1_score=test_f1_score, 
+                                                                    model_f1_score =model_f1_score,
+                                                                    train_accuracy=train_accuracy,
+                                                                    test_accuracy=test_accuracy,
+                                                                    auc_roc= roc_auc, auc_value=auc_value,                                                    
+                                                                    index_number=index_number)
+                            ## index of model added if satisy the criteria
+                            logging.info(f"Acceptable model found {metric_info_artifact}. ")
+                        index_number += 1  ## index of each model to add it in as model index if satisy the criteria
+                    if metric_info_artifact is None:
+                        logging.info(f"No model found with higher accuracy than base accuracy")
+                    return metric_info_artifact  ## will return only one model with these two conditions base_acc and diff_test_train_acc
+                except Exception as e:
+                    print(e)
+                    raise CreditException(e, sys) from e
 
-                # Save custom artifact
-              #  artifact_path = "custom_metrics"
-              #  mlflow.log_artifact(str(metric_info_artifact), artifact_path)
-                mlflow.end_run()
-
-             ## Two criterias to accept model
-            #if model accuracy is greater than base accuracy and train and test score is within certain thershold
-            #we will accept that model as accepted model
-            if model_f1_score >= base_accuracy and diff_test_train_acc < 0.05 and auc_value >0:
-                base_accuracy = model_f1_score
-                metric_info_artifact = MetricInfoArtifact(model_name=model_name,
-                                                        model_object=model,
-                                                        train_precision=train_precision,
-                                                        test_precision=test_precision,
-                                                        train_recall=train_recall,
-                                                        test_recall=test_recall,
-                                                        train_f1_score=train_f1_score,   
-                                                        test_f1_score=test_f1_score, 
-                                                        model_f1_score =model_f1_score,
-                                                        train_accuracy=train_accuracy,
-                                                        test_accuracy=test_accuracy,
-                                                        auc_roc= roc_auc, auc_value=auc_value,                                                    
-                                                        index_number=index_number)
-                ## index of model added if satisy the criteria
-                logging.info(f"Acceptable model found {metric_info_artifact}. ")
-            index_number += 1  ## index of each model to add it in as model index if satisy the criteria
-        if metric_info_artifact is None:
-            logging.info(f"No model found with higher accuracy than base accuracy")
-        return metric_info_artifact  ## will return only one model with these two conditions base_acc and diff_test_train_acc
     except Exception as e:
-        print(e)
-        raise CreditException(e, sys) from e
+        raise CreditException(e,sys) from e
+                    # finally:
+                    #     mlflow.end_run()             
+      
+
+      
+            # Save model
+            #    mlflow.sklearn.log_model(initialized_model, "model")
+                # Log model signature
+                #signature = infer_signature(initialized_model.model)
+            #   mlflow.sklearn.log_model(initialized_model.model, "model", signature=signature)
+
+
+            # Save custom artifact
+            #  artifact_path = "custom_metrics"
+            #  mlflow.log_artifact(str(metric_info_artifact), artifact_path)
+ 
+
+
 
 
 def get_sample_model_config_yaml_file(export_dir: str):
@@ -353,9 +517,10 @@ class ModelFactory:
             grid_search_cv = grid_search_cv_ref(estimator=initialized_model.model,       ## passing and initializing parameters of grid_search_cv to its object grid_search_cv_ref
                                                 param_grid=initialized_model.param_grid_search)
             ## updated final GridSearchCV with parameters
+              # we call model as estimator in gridSearchCV 
             grid_search_cv = ModelFactory.update_property_of_class(grid_search_cv,
                                                                    self.grid_search_property_data) ## update params accoding to model.yaml file
-
+                     ## eg: {params: CV=5 , verbose=2} for gird_search_cv before fitting with model and its params
             
             message = f'{">>"* 30} f"Training {type(initialized_model.model).__name__} Started." {"<<"*30}'
             logging.info(message)
@@ -364,39 +529,13 @@ class ModelFactory:
             message = f'{">>"* 30} f"Training {type(initialized_model.model).__name__}" completed {"<<"*30}'
             grid_searched_best_model = GridSearchedBestModel(model_serial_number=initialized_model.model_serial_number,
                                                              model=initialized_model.model,
-                                                             best_model=grid_search_cv.best_estimator_,
+                                                             best_model=grid_search_cv.best_estimator_, ## final model best model
                                                              best_parameters=grid_search_cv.best_params_,
                                                              best_score=grid_search_cv.best_score_
-                                                             )
+            )
+            # we call model as estimator in gridSearchCV                                                 
             # using mlflow tracking serivve for all models and its best params from GridCV
-            
-            with mlflow.start_run(run_name=initialized_model.model_name):                                                
-                                    
-                        #  mlflow.log_params(grid_search_cv.best_params_)
-                        #  mlflow.log_param(grid_search_cv.best_score_)
-                        #  mlflow.log_params(grid_search_cv.best_estimator_)
-                         mlflow.log_param("model_serial_number", initialized_model.model_serial_number)
-                         mlflow.log_params(grid_search_cv.best_params_)
-                         mlflow.log_param("best_score", grid_search_cv.best_score_)
-                         mlflow.log_params(grid_search_cv.best_estimator_.get_params())
-
-                        #  mlflow.log_metric("rmse", rmse)
-                        #  mlflow.log_metric("r2", r2)
-                        #  mlflow.log_metric("mae", mae)
-
-                        # Save model
-                     #    mlflow.sklearn.log_model(initialized_model, "model")
-                         # Log model signature
-                         #signature = infer_signature(initialized_model.model)
-                      #   mlflow.sklearn.log_model(initialized_model.model, "model", signature=signature)
-
-
-                        # Save custom artifact
-                       #  artifact_path = "custom_metrics"
-                       #  mlflow.log_artifact(str(metric_info_artifact), artifact_path)
- 
-
-
+        
 
             
 

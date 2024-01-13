@@ -1,6 +1,8 @@
 
 from credit_card_defaulters.exception import CreditException
 import sys
+import  mlflow
+import joblib
 from credit_card_defaulters.logger import logging
 from typing import List
 from credit_card_defaulters.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact
@@ -117,7 +119,7 @@ class ModelTrainer:
             ## adding best from all initialsed model as per params of gridcv we got in model factory class in grid_searched_best_model_list
             grid_searched_best_model_list:List[GridSearchedBestModel]=model_factory.grid_searched_best_model_list
             ## extraciting model data seperately into list
-            model_list = [model.best_model for model in grid_searched_best_model_list ]
+            model_list = [model for model in grid_searched_best_model_list ]
             print(f"model_list from  grid_searched_best_model_list: {model_list}")
             logging.info(f"Evaluation all trained model on training and testing dataset both")
             metric_info:MetricInfoArtifact = evaluate_classification_model(model_list=model_list,
@@ -139,7 +141,13 @@ class ModelTrainer:
             preprocessing_obj=  load_object(file_path=self.data_transformation_artifact.preprocessed_object_file_path)
             model_object = metric_info.model_object  ### from metric info, model obj is loaded
 
-
+            # Save the trained model locally
+           # model_obj_path = "C:\\data science\\Internship projects\\credit card defaulters\\Credit_card_default_prediction_with_mlflow\\model_objects\\model_obj.pkl"
+            
+            # with open(model_obj_path, 'wb') as file:
+            #     joblib.dump(model_object, file)
+           
+                        
             trained_model_file_path=self.model_trainer_config.trained_model_file_path
             ## we now save the model with both prep_obj and model in  PremiumEstimatorModel() class
             credit_model = CreditDefaultModel(preprocessing_object=preprocessing_obj,trained_model_object=model_object) 

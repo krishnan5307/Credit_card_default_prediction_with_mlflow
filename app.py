@@ -15,7 +15,7 @@ from credit_card_defaulters.entity.premium_predictor import  CreditData, CreditP
 from flask import send_file, abort, render_template
 from urllib.parse import urlparse
 from dotenv import load_dotenv
-
+import joblib
 import mlflow
 
 ROOT_DIR = os.getcwd()
@@ -114,7 +114,7 @@ def predict():
         sex = {"male":1, "female":2}
         education = {"graduate school":1, "university":2, "high school":3, "others":4, "unknown":5}
         marriage = {"married":1, "single":2, "others":3}
-        credit_data = CreditData(
+        credit_data = CreditData(            ##CreditData class obj createion
                                 LIMIT_BAL = LIMIT_BAL,
                                 SEX = sex[SEX],
                                 EDUCATION = education[EDUCATION],
@@ -140,7 +140,7 @@ def predict():
                                 PAY_AMT6 = PAY_AMT6
                                                 ) 
         
-        credit_df = credit_data.get_credit_input_data_frame() ## calling function inside hosuing class
+        credit_df = credit_data.get_credit_input_data_frame() ## calling function inside CreditData class
         credit_predictor = CreditPredictor(model_dir=MODEL_DIR)      ## creating an object with intialization as model_dir
         defaulter_cla = credit_predictor.predict(X=credit_df)   ## calling fucntion in that using CreditPredictor class, the above obj to do preiction
         print(f"output of predicetd model: {defaulter_cla}")
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     # os.environ["MLFLOW_TRACKING_URI"]=""
     # os.environ["MLFLOW_TRACKING_USERNAME"]=""
     # os.environ["MLFLOW_TRACKING_PASSWORD"]=""
-    app.run(debug=True)
+    app.run(debug=True, port=5001)  ## while deploying or hosting to cloud aws etc, we need to remove (debug=True)
 
 """
 if u want to set port and host to a specfic valid custom setting u can do that like this in __main__ method
@@ -223,3 +223,30 @@ if __name__ == "__main__":
     app.run(debug=True, host=host, port=port)
 
 """
+
+
+### TESTING CODE FOR MLFLOW_MODEL_REGISTRY
+
+
+
+# if __name__ == "__main__":
+#     # Execute the main program
+
+#     load_dotenv(r"C:\\data science\\Internship projects\\credit card defaulters\\Credit_card_default_prediction_with_mlflow\\mlflow.env")
+#      # Access environment variables "key" using os.getenv to fetch "value"
+#     MLFLOW_URI = os.getenv("MLFLOW_TRACKING_URI")
+#      # setting up the mlflow regirsty with our tracking uri 
+#     mlflow.set_registry_uri(MLFLOW_URI)
+#     tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+#     print(f"tracking_url_type_store in __main__: {tracking_url_type_store}")
+
+#     file_path_model_factory = r"C:\\data science\\Internship projects\\credit card defaulters\\Credit_card_default_prediction_with_mlflow\\model_objects\\LogisticRegression(C=10.0).joblib"
+                    
+#                 # df= pd.read_csv(r"credit_card.csv", )                                           ## using dill library to load file
+#     with open(file_path_model_factory, "rb") as file_obj:
+#                         model= joblib.load(file_obj)
+   
+#     with mlflow.start_run():
+#           mlflow.sklearn.log_model(model,"model", registered_model_name="BESTModelinstance")
+#     # ob = mlflow_demo()
+#     # ob.log_mlfow_model()
