@@ -39,6 +39,12 @@ conda activate venv/
 
 
 ### STEP 02- install the requirements
+'''
+# installsetup.py file
+python setup.py install 
+'''
+
+
 ```bash
 pip install -r requirements.txt
 ```
